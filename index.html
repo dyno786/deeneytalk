@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Deeney Talk</title>
+
+<style>
+body{
+font-family:sans-serif;
+background:#f0f8ff;
+text-align:center;
+padding:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+margin-top:20px;
+}
+
+button{
+font-size:22px;
+padding:30px;
+border:none;
+border-radius:20px;
+background:white;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+button:active{
+transform:scale(0.95);
+}
+</style>
+</head>
+
+<body>
+
+<h1>Deeney Talk</h1>
+
+<div class="grid">
+
+<button onclick="speak('Mum')">👩 Mum</button>
+<button onclick="speak('Dad')">👨 Dad</button>
+<button onclick="speak('Drink')">💧 Drink</button>
+<button onclick="speak('Food')">🍽️ Food</button>
+<button onclick="speak('Toilet')">🚽 Toilet</button>
+<button onclick="speak('Park')">🌳 Park</button>
+<button onclick="speak('Happy')">😊 Happy</button>
+<button onclick="speak('Sad')">😢 Sad</button>
+
+</div>
+
+<script>
+function speak(text){
+speechSynthesis.cancel();
+let msg=new SpeechSynthesisUtterance(text);
+speechSynthesis.speak(msg);
+}
+</script>
+
+</body>
+</html>
