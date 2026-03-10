@@ -1,582 +1,330 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lock, Plus, Volume2, Trash2, Upload, Mic2, Heart, Home, Utensils, Smile, Settings, ShieldCheck, Baby, Pencil, Gamepad2, X } from "lucide-react";
-
-const starterItems = [
-  { id: 1, category: "People", label: "Mum", phrase: "Mum", emoji: "👩", custom: false },
-  { id: 2, category: "People", label: "Dad", phrase: "Dad", emoji: "👨", custom: false },
-  { id: 3, category: "People", label: "Grandma", phrase: "Grandma", emoji: "👵", custom: false },
-  { id: 4, category: "Food", label: "Drink", phrase: "I want a drink", emoji: "💧", custom: false },
-  { id: 5, category: "Food", label: "Food", phrase: "I want food", emoji: "🍽️", custom: false },
-  { id: 6, category: "Food", label: "Banana", phrase: "I want banana", emoji: "🍌", custom: false },
-  { id: 7, category: "Play Time", label: "Park", phrase: "I want the park", emoji: "🛝", custom: false },
-  { id: 8, category: "Play Time", label: "Toy", phrase: "I want my toy", emoji: "🧸", custom: false },
-  { id: 9, category: "Play Time", label: "Ball", phrase: "I want ball", emoji: "⚽", custom: false },
-  { id: 10, category: "Feelings", label: "Happy", phrase: "I am happy", emoji: "😊", custom: false },
-  { id: 11, category: "Feelings", label: "Sad", phrase: "I am sad", emoji: "😢", custom: false },
-  { id: 12, category: "Needs", label: "Toilet", phrase: "I need the toilet", emoji: "🚽", custom: false },
-];
-
-const categoryMeta = {
-  All: { icon: Home },
-  People: { icon: Heart },
-  Food: { icon: Utensils },
-  "Play Time": { icon: Gamepad2 },
-  Feelings: { icon: Smile },
-  Needs: { icon: Mic2 },
-};
-
-const STORAGE_KEY = "aac-child-board-items-v3";
-const PIN_KEY = "aac-child-board-pin-v1";
-const DEFAULT_PIN = "1234";
-
-function speakText(text) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.85;
-  utterance.pitch = 1;
-  utterance.volume = 1;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
-}
-
-function playClapSound() {
-  if (typeof window === "undefined") return;
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-    const now = ctx.currentTime;
-
-    const burst = (start, duration, gainValue) => {
-      const bufferSize = Math.floor(ctx.sampleRate * duration);
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i += 1) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize / 5));
-      }
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(gainValue, start);
-      gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-      const filter = ctx.createBiquadFilter();
-      filter.type = "bandpass";
-      filter.frequency.value = 1800;
-      filter.Q.value = 0.7;
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-      source.start(start);
-      source.stop(start + duration);
-    };
-
-    burst(now, 0.12, 0.45);
-    burst(now + 0.14, 0.12, 0.35);
-  } catch {
-    // ignore sound errors
-  }
-}
-
-function Tile({ item, onPress, showEditControls, onEdit, onDelete }) {
-  return (
-    <motion.div whileTap={{ scale: 0.97 }}>
-      <Card className="h-full rounded-[2rem] shadow-md border-0 bg-white overflow-hidden">
-        <CardContent className="p-3 md:p-4">
-          <button
-            onClick={() => onPress(item)}
-            className="w-full text-left"
-            aria-label={`Say ${item.label}`}
-          >
-            <div className="aspect-square w-full rounded-[2rem] bg-sky-50 overflow-hidden flex items-center justify-center mb-3 border-2 border-sky-100">
-              {item.image ? (
-                <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-6xl md:text-7xl">{item.emoji || "🧩"}</span>
-              )}
-            </div>
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <div className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{item.label}</div>
-                <div className="text-base md:text-lg text-slate-500 mt-1 leading-snug">{item.phrase}</div>
-              </div>
-              <div className="rounded-full bg-sky-100 p-2 shrink-0 mt-1">
-                <Volume2 className="w-6 h-6 text-sky-700" />
-              </div>
-            </div>
-          </button>
-
-          {showEditControls && (
-            <div className="grid grid-cols-2 gap-2 pt-3">
-              <Button variant="outline" className="rounded-2xl h-11" onClick={() => onEdit(item)}>
-                <Pencil className="w-4 h-4 mr-2" /> Edit
-              </Button>
-              <Button variant="outline" className="rounded-2xl h-11" onClick={() => onDelete(item.id)}>
-                <Trash2 className="w-4 h-4 mr-2" /> Delete
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-}
-
-export default function AACChildCommunicationApp() {
-  const [items, setItems] = useState(starterItems);
-  const [category, setCategory] = useState("People");
-  const [newLabel, setNewLabel] = useState("");
-  const [newPhrase, setNewPhrase] = useState("");
-  const [newCategory, setNewCategory] = useState("People");
-  const [newEmoji, setNewEmoji] = useState("🙂");
-  const [imageData, setImageData] = useState("");
-  const [lastSpoken, setLastSpoken] = useState("Tap a picture to speak");
-  const [parentMode, setParentMode] = useState(false);
-  const [pinInput, setPinInput] = useState("");
-  const [savedPin, setSavedPin] = useState(DEFAULT_PIN);
-  const [pinError, setPinError] = useState("");
-  const [newPin, setNewPin] = useState(DEFAULT_PIN);
-  const [editingId, setEditingId] = useState(null);
-  const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const fileRef = useRef(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const storedItems = window.localStorage.getItem(STORAGE_KEY);
-    const storedPin = window.localStorage.getItem(PIN_KEY);
-    if (storedItems) {
-      try {
-        const parsed = JSON.parse(storedItems);
-        if (Array.isArray(parsed) && parsed.length > 0) setItems(parsed);
-      } catch {
-        // ignore
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deeney Talk</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #eaf7ff, #eefdf3, #fff7e8);
+      color: #1f2937;
     }
-    if (storedPin) {
-      setSavedPin(storedPin);
-      setNewPin(storedPin);
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
     }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(PIN_KEY, savedPin);
-  }, [savedPin]);
-
-  const categories = useMemo(() => {
-    const preferredOrder = ["People", "Food", "Play Time", "Feelings", "Needs"];
-    const existing = [...new Set(items.map((i) => i.category))];
-    const ordered = preferredOrder.filter((c) => existing.includes(c));
-    const extras = existing.filter((c) => !preferredOrder.includes(c));
-    return [...ordered, ...extras];
-  }, [items]);
-
-  const filteredItems = useMemo(() => items.filter((i) => i.category === category), [items, category]);
-
-  const resetForm = () => {
-    setNewLabel("");
-    setNewPhrase("");
-    setNewCategory("People");
-    setNewEmoji("🙂");
-    setImageData("");
-    setEditingId(null);
-    if (fileRef.current) fileRef.current.value = "";
-  };
-
-  const handlePress = (item) => {
-    setSelectedItem(item);
-    setLastSpoken(item.phrase || item.label);
-    playClapSound();
-    speakText(item.phrase || item.label);
-  };
-
-  const handleSaveItem = () => {
-    if (!newLabel.trim()) return;
-
-    if (editingId) {
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === editingId
-            ? {
-                ...item,
-                label: newLabel.trim(),
-                phrase: (newPhrase || newLabel).trim(),
-                category: newCategory,
-                emoji: newEmoji || "🙂",
-                image: imageData || item.image || "",
-              }
-            : item
-        )
-      );
-    } else {
-      const entry = {
-        id: Date.now(),
-        category: newCategory,
-        label: newLabel.trim(),
-        phrase: (newPhrase || newLabel).trim(),
-        emoji: newEmoji || "🙂",
-        image: imageData || "",
-        custom: true,
-      };
-      setItems((prev) => [entry, ...prev]);
-      setCategory(newCategory);
+    .header {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
     }
-
-    resetForm();
-  };
-
-  const handleDelete = (id) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
-    if (editingId === id) resetForm();
-  };
-
-  const handleEdit = (item) => {
-    setEditingId(item.id);
-    setNewLabel(item.label || "");
-    setNewPhrase(item.phrase || "");
-    setNewCategory(item.category || "People");
-    setNewEmoji(item.emoji || "🙂");
-    setImageData(item.image || "");
-  };
-
-  const onPickImage = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setImageData(String(reader.result || ""));
-    reader.readAsDataURL(file);
-  };
-
-  const openParentMode = () => {
-    setPinInput("");
-    setPinError("");
-    setIsPinDialogOpen(true);
-  };
-
-  const unlockParentMode = () => {
-    if (pinInput === savedPin) {
-      setParentMode(true);
-      setIsPinDialogOpen(false);
-      setPinError("");
-      return;
+    h1 {
+      margin: 0 0 8px;
+      font-size: 40px;
     }
-    setPinError("Incorrect PIN. Please try again.");
-  };
-
-  const saveNewPin = () => {
-    if (!/^\d{4}$/.test(newPin)) return;
-    setSavedPin(newPin);
-    setIsSettingsOpen(false);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 via-emerald-50 to-amber-50 p-3 md:p-6">
-      <div className="max-w-7xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
-          <div className="rounded-[2rem] bg-white shadow-sm p-4 md:p-6 border border-sky-100">
-            <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="rounded-full bg-amber-100 p-2">
-                    <Baby className="w-5 h-5" />
-                  </div>
-                  <span className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em]">Toddler friendly board</span>
-                </div>
-                <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900">
-                  My Talk Board
-                </h1>
-                <p className="text-slate-600 mt-2 text-lg md:text-xl max-w-2xl leading-relaxed">
-                  Tap a picture tab, then press a button to see it large and hear a happy clap.
-                </p>
-              </div>
-
-              <div className="flex flex-col md:flex-row gap-3 md:items-stretch">
-                <div className="rounded-[1.5rem] bg-sky-100 px-4 py-3 min-w-[260px] border border-sky-200">
-                  <div className="text-sm uppercase tracking-wide text-sky-700 font-bold">Last spoken</div>
-                  <div className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{lastSpoken}</div>
-                </div>
-                {!parentMode ? (
-                  <Button onClick={openParentMode} className="h-auto min-h-[72px] rounded-[1.5rem] px-5 text-lg font-bold">
-                    <Lock className="w-5 h-5 mr-2" /> Parent Lock
-                  </Button>
-                ) : (
-                  <Button variant="outline" onClick={() => setParentMode(false)} className="h-auto min-h-[72px] rounded-[1.5rem] px-5 text-lg font-bold">
-                    <ShieldCheck className="w-5 h-5 mr-2" /> Parent Mode On
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 items-start">
-          <div>
-            <div className="bg-white rounded-[2rem] p-4 shadow-sm mb-5 border border-sky-100">
-              <Tabs value={category} onValueChange={setCategory}>
-                <TabsList className="flex flex-wrap h-auto gap-3 bg-transparent p-0">
-                  {categories.map((cat) => {
-                    const Icon = categoryMeta[cat]?.icon || Home;
-                    return (
-                      <TabsTrigger
-                        key={cat}
-                        value={cat}
-                        className="rounded-[1.25rem] px-5 py-4 text-base md:text-lg font-bold data-[state=active]:bg-slate-900 data-[state=active]:text-white border bg-slate-50"
-                      >
-                        <Icon className="w-5 h-5 mr-2" />
-                        {cat}
-                      </TabsTrigger>
-                    );
-                  })}
-                </TabsList>
-              </Tabs>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-5">
-              {filteredItems.map((item) => (
-                <Tile
-                  key={item.id}
-                  item={item}
-                  onPress={handlePress}
-                  showEditControls={parentMode}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="sticky top-4 space-y-4">
-            {parentMode ? (
-              <>
-                <Card className="rounded-[2rem] border-0 shadow-sm bg-white border border-sky-100">
-                  <CardContent className="p-5 md:p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Plus className="w-5 h-5" />
-                      <h2 className="text-2xl font-black">{editingId ? "Edit button" : "Add a new button"}</h2>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-bold text-slate-700">Button name</label>
-                        <Input
-                          value={newLabel}
-                          onChange={(e) => setNewLabel(e.target.value)}
-                          placeholder="Example: Brother"
-                          className="mt-1 rounded-2xl h-12 text-base"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-bold text-slate-700">What it should say</label>
-                        <Input
-                          value={newPhrase}
-                          onChange={(e) => setNewPhrase(e.target.value)}
-                          placeholder="Example: I want Dad"
-                          className="mt-1 rounded-2xl h-12 text-base"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-bold text-slate-700">Category</label>
-                        <select
-                          value={newCategory}
-                          onChange={(e) => setNewCategory(e.target.value)}
-                          className="mt-1 w-full h-12 rounded-2xl border px-3 bg-white text-base"
-                        >
-                          {["People", "Food", "Play Time", "Feelings", "Needs"].map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-bold text-slate-700">Emoji fallback</label>
-                        <Input
-                          value={newEmoji}
-                          onChange={(e) => setNewEmoji(e.target.value)}
-                          placeholder="🙂"
-                          className="mt-1 rounded-2xl h-12 text-base"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-bold text-slate-700">Upload your own photo</label>
-                        <div className="mt-1 rounded-2xl border-2 border-dashed p-4 bg-slate-50">
-                          <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} className="block w-full text-sm" />
-                          <div className="text-sm text-slate-500 mt-2 flex items-center gap-2 leading-relaxed">
-                            <Upload className="w-4 h-4" /> Add your own People, Food, Play Time, Feelings, or Needs pictures.
-                          </div>
-                        </div>
-                        {imageData && (
-                          <div className="mt-3 rounded-2xl overflow-hidden border bg-slate-50">
-                            <img src={imageData} alt="Preview" className="w-full h-44 object-cover" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <Button onClick={handleSaveItem} className="h-12 rounded-2xl text-base font-bold">
-                          {editingId ? "Save changes" : "Add button"}
-                        </Button>
-                        <Button variant="outline" onClick={resetForm} className="h-12 rounded-2xl text-base font-bold">
-                          Clear
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="rounded-[2rem] border-0 shadow-sm bg-white border border-slate-100">
-                  <CardContent className="p-5 md:p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Settings className="w-5 h-5" />
-                      <h2 className="text-2xl font-black">Parent settings</h2>
-                    </div>
-                    <p className="text-slate-600 text-base leading-relaxed mb-4">
-                      Parent mode is locked with a 4-digit PIN. Default PIN is <span className="font-black">1234</span> until you change it.
-                    </p>
-                    <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full rounded-2xl h-12 text-base font-bold">
-                          Change PIN
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="rounded-3xl">
-                        <DialogHeader>
-                          <DialogTitle>Change parent PIN</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="text-sm font-bold text-slate-700">New 4-digit PIN</label>
-                            <Input
-                              value={newPin}
-                              onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                              placeholder="1234"
-                              className="mt-1 rounded-2xl h-12 text-base"
-                            />
-                          </div>
-                          <Button onClick={saveNewPin} className="w-full rounded-2xl h-12 text-base font-bold">
-                            Save PIN
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </CardContent>
-                </Card>
-              </>
-            ) : (
-              <Card className="rounded-[2rem] border-0 shadow-sm bg-white border border-emerald-100">
-                <CardContent className="p-5 md:p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Lock className="w-5 h-5" />
-                    <h2 className="text-2xl font-black">Parent area locked</h2>
-                  </div>
-                  <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-4">
-                    Your child only sees the category tabs and communication buttons. Editing, deleting, uploading photos, and changing settings stay hidden until you unlock parent mode.
-                  </p>
-                  <Button onClick={openParentMode} className="w-full rounded-2xl h-14 text-lg font-bold">
-                    Unlock parent mode
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full rounded-2xl h-12 text-base font-bold">
-                  How to use on iPad
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="rounded-3xl">
-                <DialogHeader>
-                  <DialogTitle>Use this on iPad</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-3 text-slate-700 text-base leading-relaxed">
-                  <p>1. Unlock parent mode with your PIN.</p>
-                  <p>2. Upload your own real photos into People, Food, and Play Time tabs.</p>
-                  <p>3. Tap any button and it opens bigger with a clap sound and voice.</p>
-                  <p>4. Lock parent mode again so only the large toddler-friendly tabs remain.</p>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-
-        <Dialog open={isPinDialogOpen} onOpenChange={setIsPinDialogOpen}>
-          <DialogContent className="rounded-3xl">
-            <DialogHeader>
-              <DialogTitle>Enter parent PIN</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-bold text-slate-700">4-digit PIN</label>
-                <Input
-                  type="password"
-                  value={pinInput}
-                  onChange={(e) => setPinInput(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                  placeholder="Enter PIN"
-                  className="mt-1 rounded-2xl h-12 text-base"
-                />
-                {pinError ? <p className="text-sm text-red-600 mt-2">{pinError}</p> : null}
-              </div>
-              <Button onClick={unlockParentMode} className="w-full rounded-2xl h-12 text-base font-bold">
-                Unlock
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <AnimatePresence>
-          {selectedItem && (
-            <motion.div
-              className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-[2rem] p-4 md:p-6 w-full max-w-2xl shadow-2xl relative"
-              >
-                <button
-                  onClick={() => setSelectedItem(null)}
-                  className="absolute right-4 top-4 rounded-full bg-slate-100 p-2"
-                  aria-label="Close preview"
-                >
-                  <X className="w-6 h-6 text-slate-700" />
-                </button>
-
-                <div className="rounded-[2rem] overflow-hidden bg-sky-50 border border-sky-100 aspect-square w-full flex items-center justify-center">
-                  {selectedItem.image ? (
-                    <img src={selectedItem.image} alt={selectedItem.label} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-[7rem] md:text-[9rem]">{selectedItem.emoji || "🧩"}</span>
-                  )}
-                </div>
-
-                <div className="pt-5 text-center">
-                  <div className="text-4xl md:text-5xl font-black text-slate-900">{selectedItem.label}</div>
-                  <div className="text-xl md:text-2xl text-slate-600 mt-2">{selectedItem.phrase}</div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+    .sub {
+      font-size: 20px;
+      color: #4b5563;
+      margin: 0;
+    }
+    .tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: white;
+      border-radius: 24px;
+      padding: 14px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    }
+    .tab {
+      border: 1px solid #d1d5db;
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px 20px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: #111827;
+      color: white;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: white;
+      border: none;
+      border-radius: 26px;
+      padding: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+    .card:active { transform: scale(0.98); }
+    .imgbox {
+      aspect-ratio: 1 / 1;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #e0f2fe;
+      border: 2px solid #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .imgbox img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .emoji {
+      font-size: 84px;
+    }
+    .label {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .phrase {
+      font-size: 18px;
+      color: #6b7280;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 999;
+    }
+    .modal.show { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 760px;
+      background: white;
+      border-radius: 28px;
+      padding: 18px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      border: none;
+      background: #f1f5f9;
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      font-size: 28px;
+      cursor: pointer;
+    }
+    .bigimg {
+      aspect-ratio: 1 / 1;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #e0f2fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bigimg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .bigemoji {
+      font-size: 160px;
+    }
+    .biglabel {
+      text-align: center;
+      font-size: 48px;
+      font-weight: 900;
+      margin-top: 16px;
+    }
+    .bigphrase {
+      text-align: center;
+      font-size: 26px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>Deeney Talk</h1>
+      <p class="sub">Tap a tab, then press a picture to hear it and see it bigger.</p>
     </div>
-  );
-}
+
+    <div class="tabs" id="tabs"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <button class="close" onclick="closeModal()">×</button>
+      <div class="bigimg" id="modalImage"></div>
+      <div class="biglabel" id="modalLabel"></div>
+      <div class="bigphrase" id="modalPhrase"></div>
+    </div>
+  </div>
+
+  <script>
+    const items = [
+      { category: "People", label: "Mum", phrase: "Mum", image: "mum.jpg", emoji: "👩" },
+      { category: "People", label: "Dad", phrase: "Dad", image: "dad.jpg", emoji: "👨" },
+      { category: "People", label: "Grandma", phrase: "Grandma", image: "grandma.jpg", emoji: "👵" },
+
+      { category: "Food", label: "Drink", phrase: "I want a drink", image: "drink.jpg", emoji: "💧" },
+      { category: "Food", label: "Food", phrase: "I want food", image: "food.jpg", emoji: "🍽️" },
+      { category: "Food", label: "Banana", phrase: "I want banana", image: "banana.jpg", emoji: "🍌" },
+
+      { category: "Play Time", label: "Park", phrase: "I want the park", image: "park.jpg", emoji: "🛝" },
+      { category: "Play Time", label: "Toy", phrase: "I want my toy", image: "toy.jpg", emoji: "🧸" },
+      { category: "Play Time", label: "Ball", phrase: "I want ball", image: "ball.jpg", emoji: "⚽" }
+    ];
+
+    const categories = ["People", "Food", "Play Time"];
+    let currentCategory = "People";
+
+    function speakText(text) {
+      if (!("speechSynthesis" in window)) return;
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.rate = 0.85;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(msg);
+    }
+
+    function playClapSound() {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        const ctx = new AudioContextClass();
+        const now = ctx.currentTime;
+
+        function burst(start, duration, gainValue) {
+          const bufferSize = Math.floor(ctx.sampleRate * duration);
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize / 5));
+          }
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(gainValue, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+          const filter = ctx.createBiquadFilter();
+          filter.type = "bandpass";
+          filter.frequency.value = 1800;
+          filter.Q.value = 0.7;
+          source.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+          source.start(start);
+          source.stop(start + duration);
+        }
+
+        burst(now, 0.12, 0.45);
+        burst(now + 0.14, 0.12, 0.35);
+      } catch (e) {}
+    }
+
+    function renderTabs() {
+      const tabs = document.getElementById("tabs");
+      tabs.innerHTML = "";
+      categories.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "tab" + (cat === currentCategory ? " active" : "");
+        btn.textContent = cat;
+        btn.onclick = () => {
+          currentCategory = cat;
+          renderTabs();
+          renderGrid();
+        };
+        tabs.appendChild(btn);
+      });
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+      items
+        .filter(item => item.category === currentCategory)
+        .forEach(item => {
+          const card = document.createElement("button");
+          card.className = "card";
+          card.onclick = () => openItem(item);
+
+          const imgbox = document.createElement("div");
+          imgbox.className = "imgbox";
+
+          const img = document.createElement("img");
+          img.src = item.image;
+          img.alt = item.label;
+          img.onerror = function() {
+            imgbox.innerHTML = `<div class="emoji">${item.emoji || "🧩"}</div>`;
+          };
+
+          imgbox.appendChild(img);
+
+          const label = document.createElement("div");
+          label.className = "label";
+          label.textContent = item.label;
+
+          const phrase = document.createElement("div");
+          phrase.className = "phrase";
+          phrase.textContent = item.phrase;
+
+          card.appendChild(imgbox);
+          card.appendChild(label);
+          card.appendChild(phrase);
+          grid.appendChild(card);
+        });
+    }
+
+    function openItem(item) {
+      document.getElementById("modalLabel").textContent = item.label;
+      document.getElementById("modalPhrase").textContent = item.phrase;
+
+      const modalImage = document.getElementById("modalImage");
+      modalImage.innerHTML = "";
+
+      const img = document.createElement("img");
+      img.src = item.image;
+      img.alt = item.label;
+      img.onerror = function() {
+        modalImage.innerHTML = `<div class="bigemoji">${item.emoji || "🧩"}</div>`;
+      };
+
+      modalImage.appendChild(img);
+      document.getElementById("modal").classList.add("show");
+
+      playClapSound();
+      speakText(item.phrase || item.label);
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.remove("show");
+    }
+
+    document.getElementById("modal").addEventListener("click", function(e) {
+      if (e.target.id === "modal") closeModal();
+    });
+
+    renderTabs();
+    renderGrid();
+  </script>
+</body>
+</html>
