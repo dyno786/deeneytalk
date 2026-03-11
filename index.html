@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deeny Talk Board</title>
+  <title>My Talk Board</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -81,6 +81,7 @@
       font-size: 28px;
       font-weight: 900;
       line-height: 1.1;
+      word-break: break-word;
     }
 
     .layout {
@@ -181,6 +182,28 @@
       line-height: 1.3;
     }
 
+    .edit-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .small-btn {
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #111827;
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .small-btn.danger {
+      color: #991b1b;
+    }
+
     .card-panel {
       padding: 20px;
       position: sticky;
@@ -220,6 +243,70 @@
       color: #111827;
       border: 1px solid #d1d5db;
       margin-top: 10px;
+    }
+
+    .btn-danger {
+      background: #7f1d1d;
+      color: white;
+      margin-top: 10px;
+    }
+
+    .panel-section {
+      margin-bottom: 22px;
+    }
+
+    .section-heading {
+      font-size: 22px;
+      font-weight: 900;
+      margin: 0 0 12px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    .text-input,
+    .select-input,
+    .file-input {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 16px;
+      min-height: 52px;
+      padding: 12px 14px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .preview-box {
+      margin-top: 12px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #d1d5db;
+      background: #f8fafc;
+    }
+
+    .preview-box img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .helper {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
     .modal {
@@ -309,14 +396,6 @@
       margin-bottom: 16px;
     }
 
-    .input-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 700;
-      color: #334155;
-      margin-bottom: 8px;
-    }
-
     .pin-input {
       width: 100%;
       height: 52px;
@@ -328,6 +407,12 @@
 
     .error-text {
       color: #dc2626;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .success-text {
+      color: #166534;
       font-size: 14px;
       margin-top: 8px;
     }
@@ -385,6 +470,11 @@
       .big-emoji {
         font-size: 120px;
       }
+
+      .row-2,
+      .edit-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -394,8 +484,8 @@
       <div class="header-top">
         <div>
           <div class="title-small">Toddler friendly board</div>
-          <h1>Deeney Talk Board</h1>
-          <div class="sub">Tap a category tab, then press a button to see it large and hear a happy clap.</div>
+          <h1>My Talk Board</h1>
+          <div class="sub">Tap a category tab, then press a button to see it large and hear the word.</div>
         </div>
         <div class="status-box">
           <div class="status-label">Last spoken</div>
@@ -412,14 +502,7 @@
         <div class="grid" id="grid"></div>
       </div>
 
-      <div class="card-panel">
-        <h2 class="card-title">Parent area locked</h2>
-        <div class="locked-text">
-          Your child only sees the category tabs and communication buttons. Editing, deleting, uploading photos, and changing settings stay hidden until you unlock parent mode.
-        </div>
-        <button class="btn btn-primary" onclick="openPinModal()">Unlock parent mode</button>
-        <button class="btn btn-outline" onclick="openHelpModal()">How to use on iPad</button>
-      </div>
+      <div class="card-panel" id="sidePanel"></div>
     </div>
   </div>
 
@@ -438,7 +521,7 @@
     <div class="modal-box pin-modal-box">
       <button class="close-btn" onclick="closePinModal()">×</button>
       <div class="pin-title">Enter parent PIN</div>
-      <label class="input-label" for="pinInput">4-digit PIN</label>
+      <label class="label" for="pinInput">4-digit PIN</label>
       <input id="pinInput" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="Enter PIN" />
       <div class="error-text" id="pinError"></div>
       <button class="btn btn-primary" style="margin-top:16px;" onclick="unlockParentMode()">Unlock</button>
@@ -451,45 +534,66 @@
       <button class="close-btn" onclick="closeHelpModal()">×</button>
       <div class="pin-title">Use this on iPad</div>
       <div class="help-text">1. Unlock parent mode with your PIN.</div>
-      <div class="help-text">2. Upload your own real photos into Food, Play, Mood, and People tabs.</div>
-      <div class="help-text">3. Tap any button and it opens bigger with a clap sound and voice.</div>
+      <div class="help-text">2. Add or edit photos directly on the live site.</div>
+      <div class="help-text">3. Tap any button and it opens bigger with voice.</div>
       <div class="help-text">4. Lock parent mode again so only the large toddler-friendly tabs remain.</div>
     </div>
   </div>
 
   <script>
+    const STORAGE_KEY = "aac-child-board-items-html-v1";
+    const PIN_KEY = "aac-child-board-pin-html-v1";
     const DEFAULT_PIN = "1234";
-    const PIN_KEY = "aac-child-board-pin-v1";
 
     let savedPin = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
     let currentCategory = "Food";
+    let parentMode = false;
+    let editingId = null;
+    let imageData = "";
 
-    const items = [
-      { id: 1, category: "Food", label: "Wotsits", phrase: "Wotsits", image: "wotsits.jpg", emoji: "🧀" },
-      { id: 2, category: "Food", label: "Skips", phrase: "Skips", image: "skips.jpg", emoji: "🍤" },
-      { id: 3, category: "Food", label: "Nutella Biscuits", phrase: "Nutella Biscuits", image: "nutella.jpg", emoji: "🍪" },
-      { id: 4, category: "Food", label: "Jaffa Cakes", phrase: "Jaffa Cakes", image: "jaffa.jpg", emoji: "🍰" },
-      { id: 5, category: "Food", label: "Maryland Cookies", phrase: "Maryland Cookies", image: "maryland.jpg", emoji: "🍪" },
-      { id: 6, category: "Food", label: "Coffee Shop", phrase: "Coffee Shop", image: "coffee.jpg", emoji: "☕" },
+    const starterItems = [
+      { id: 1, category: "Food", label: "Wotsits", phrase: "Wotsits", image: "wotsits.jpg", emoji: "🧀", custom: false },
+      { id: 2, category: "Food", label: "Skips", phrase: "Skips", image: "skips.jpg", emoji: "🍤", custom: false },
+      { id: 3, category: "Food", label: "Nutella Biscuits", phrase: "Nutella Biscuits", image: "nutella.jpg", emoji: "🍪", custom: false },
+      { id: 4, category: "Food", label: "Jaffa Cakes", phrase: "Jaffa Cakes", image: "jaffa.jpg", emoji: "🍰", custom: false },
+      { id: 5, category: "Food", label: "Maryland Cookies", phrase: "Maryland Cookies", image: "maryland.jpg", emoji: "🍪", custom: false },
+      { id: 6, category: "Food", label: "Coffee Shop", phrase: "Coffee Shop", image: "coffee.jpg", emoji: "☕", custom: false },
 
-      { id: 7, category: "Play", label: "Swing", phrase: "Swing", image: "swing.jpg", emoji: "🛝" },
-      { id: 8, category: "Play", label: "Trampoline", phrase: "Trampoline", image: "trampoline.jpg", emoji: "🤸" },
-      { id: 9, category: "Play", label: "Park Swing", phrase: "Park Swing", image: "parkswing.jpg", emoji: "🎠" },
+      { id: 7, category: "Play", label: "Swing", phrase: "Swing", image: "swing.jpg", emoji: "🛝", custom: false },
+      { id: 8, category: "Play", label: "Trampoline", phrase: "Trampoline", image: "trampoline.jpg", emoji: "🤸", custom: false },
+      { id: 9, category: "Play", label: "Park Swing", phrase: "Park Swing", image: "parkswing.jpg", emoji: "🎠", custom: false },
 
-      { id: 10, category: "Mood", label: "Happy", phrase: "Happy", image: "happy.jpg", emoji: "😊" },
-      { id: 11, category: "Mood", label: "Sad", phrase: "Sad", image: "sad.jpg", emoji: "😢" },
+      { id: 10, category: "Mood", label: "Happy", phrase: "Happy", image: "happy.jpg", emoji: "😊", custom: false },
+      { id: 11, category: "Mood", label: "Sad", phrase: "Sad", image: "sad.jpg", emoji: "😢", custom: false },
 
-      { id: 12, category: "People", label: "Mum", phrase: "Mum", image: "mum.jpg", emoji: "👩" },
-      { id: 13, category: "People", label: "Dad", phrase: "Dad", image: "dad.jpg", emoji: "👨" },
-      { id: 14, category: "People", label: "Sami", phrase: "Sami", image: "sami.jpg", emoji: "🧒" },
-      { id: 15, category: "People", label: "Sufyaan", phrase: "Sufyaan", image: "sufyaan.jpg", emoji: "🧒" },
-      { id: 16, category: "People", label: "Nafeesah", phrase: "Nafeesah", image: "nafeesah.jpg", emoji: "👧" },
-      { id: 17, category: "People", label: "Laibah", phrase: "Laibah", image: "laibah.jpg", emoji: "👧" },
-      { id: 18, category: "People", label: "Kab", phrase: "Kab", image: "kab.jpg", emoji: "🧒" },
-      { id: 19, category: "People", label: "Meera", phrase: "Meera", image: "meera.jpg", emoji: "👧" }
+      { id: 12, category: "People", label: "Mum", phrase: "Mum", image: "mum.jpg", emoji: "👩", custom: false },
+      { id: 13, category: "People", label: "Dad", phrase: "Dad", image: "dad.jpg", emoji: "👨", custom: false },
+      { id: 14, category: "People", label: "Sami", phrase: "Sami", image: "sami.jpg", emoji: "🧒", custom: false },
+      { id: 15, category: "People", label: "Sufyaan", phrase: "Sufyaan", image: "sufyaan.jpg", emoji: "🧒", custom: false },
+      { id: 16, category: "People", label: "Nafeesah", phrase: "Nafeesah", image: "nafeesah.jpg", emoji: "👧", custom: false },
+      { id: 17, category: "People", label: "Laibah", phrase: "Laibah", image: "laibah.jpg", emoji: "👧", custom: false },
+      { id: 18, category: "People", label: "Kab", phrase: "Kab", image: "kab.jpg", emoji: "🧒", custom: false },
+      { id: 19, category: "People", label: "Meera", phrase: "Meera", image: "meera.jpg", emoji: "👧", custom: false }
     ];
 
+    let items = loadItems();
     const categories = ["Food", "Play", "Mood", "People"];
+
+    function loadItems() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return [...starterItems];
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+        return [...starterItems];
+      } catch {
+        return [...starterItems];
+      }
+    }
+
+    function saveItems() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
 
     function speakText(text) {
       if (!("speechSynthesis" in window)) return;
@@ -499,45 +603,6 @@
       utterance.volume = 1;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
-    }
-
-    function playClapSound() {
-      try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return;
-        const ctx = new AudioContextClass();
-        const now = ctx.currentTime;
-
-        function burst(start, duration, gainValue) {
-          const bufferSize = Math.floor(ctx.sampleRate * duration);
-          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize / 5));
-          }
-          const source = ctx.createBufferSource();
-          source.buffer = buffer;
-
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(gainValue, start);
-          gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-
-          const filter = ctx.createBiquadFilter();
-          filter.type = "bandpass";
-          filter.frequency.value = 1800;
-          filter.Q.value = 0.7;
-
-          source.connect(filter);
-          filter.connect(gain);
-          gain.connect(ctx.destination);
-
-          source.start(start);
-          source.stop(start + duration);
-        }
-
-        burst(now, 0.12, 0.45);
-        burst(now + 0.14, 0.12, 0.35);
-      } catch (e) {}
     }
 
     function renderTabs() {
@@ -574,7 +639,7 @@
           imageBox.className = "tile-image";
 
           const img = document.createElement("img");
-          img.src = item.image;
+          img.src = item.image || "";
           img.alt = item.label;
           img.onerror = function() {
             imageBox.innerHTML = '<div class="emoji">' + (item.emoji || "🧩") + '</div>';
@@ -594,6 +659,33 @@
           button.appendChild(label);
           button.appendChild(phrase);
 
+          if (parentMode) {
+            const editRow = document.createElement("div");
+            editRow.className = "edit-row";
+
+            const editBtn = document.createElement("button");
+            editBtn.className = "small-btn";
+            editBtn.type = "button";
+            editBtn.textContent = "Edit";
+            editBtn.onclick = function(e) {
+              e.stopPropagation();
+              startEdit(item.id);
+            };
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "small-btn danger";
+            deleteBtn.type = "button";
+            deleteBtn.textContent = "Delete";
+            deleteBtn.onclick = function(e) {
+              e.stopPropagation();
+              deleteItem(item.id);
+            };
+
+            editRow.appendChild(editBtn);
+            editRow.appendChild(deleteBtn);
+            button.appendChild(editRow);
+          }
+
           grid.appendChild(button);
         });
     }
@@ -607,7 +699,7 @@
       modalImage.innerHTML = "";
 
       const img = document.createElement("img");
-      img.src = item.image;
+      img.src = item.image || "";
       img.alt = item.label;
       img.onerror = function() {
         modalImage.innerHTML = '<div class="big-emoji">' + (item.emoji || "🧩") + '</div>';
@@ -616,7 +708,6 @@
       modalImage.appendChild(img);
 
       document.getElementById("itemModal").classList.add("show");
-      playClapSound();
       speakText(item.phrase || item.label);
     }
 
@@ -637,11 +728,21 @@
     function unlockParentMode() {
       const pinInput = document.getElementById("pinInput").value;
       if (pinInput === savedPin) {
+        parentMode = true;
         closePinModal();
-        alert("Parent mode unlocked. The full live edit panel can be added next.");
+        renderSidePanel();
+        renderGrid();
       } else {
         document.getElementById("pinError").textContent = "Incorrect PIN. Please try again.";
       }
+    }
+
+    function lockParentMode() {
+      parentMode = false;
+      editingId = null;
+      imageData = "";
+      renderSidePanel();
+      renderGrid();
     }
 
     function openHelpModal() {
@@ -650,6 +751,202 @@
 
     function closeHelpModal() {
       document.getElementById("helpModal").classList.remove("show");
+    }
+
+    function renderSidePanel() {
+      const side = document.getElementById("sidePanel");
+
+      if (!parentMode) {
+        side.innerHTML = `
+          <h2 class="card-title">Parent area locked</h2>
+          <div class="locked-text">
+            Your child only sees the category tabs and communication buttons. Editing, deleting, uploading photos, and changing settings stay hidden until you unlock parent mode.
+          </div>
+          <button class="btn btn-primary" onclick="openPinModal()">Unlock parent mode</button>
+          <button class="btn btn-outline" onclick="openHelpModal()">How to use on iPad</button>
+        `;
+        return;
+      }
+
+      const editingItem = editingId ? items.find(i => i.id === editingId) : null;
+
+      side.innerHTML = `
+        <div class="panel-section">
+          <h2 class="card-title">${editingItem ? "Edit button" : "Add a new button"}</h2>
+
+          <label class="label" for="itemLabel">Button name</label>
+          <input class="text-input" id="itemLabel" placeholder="Example: Sami" value="${escapeHtml(editingItem ? editingItem.label : "")}" />
+
+          <div style="height:12px;"></div>
+
+          <label class="label" for="itemPhrase">What it should say</label>
+          <input class="text-input" id="itemPhrase" placeholder="Example: Sami" value="${escapeHtml(editingItem ? editingItem.phrase : "")}" />
+
+          <div style="height:12px;"></div>
+
+          <label class="label" for="itemCategory">Category</label>
+          <select class="select-input" id="itemCategory">
+            ${categories.map(cat => `<option value="${cat}" ${editingItem && editingItem.category === cat ? "selected" : (!editingItem && currentCategory === cat ? "selected" : "")}>${cat}</option>`).join("")}
+          </select>
+
+          <div style="height:12px;"></div>
+
+          <label class="label" for="itemEmoji">Emoji fallback</label>
+          <input class="text-input" id="itemEmoji" placeholder="🙂" value="${escapeHtml(editingItem ? (editingItem.emoji || "") : "🙂")}" />
+
+          <div style="height:12px;"></div>
+
+          <label class="label" for="itemImage">Upload your own photo</label>
+          <input class="file-input" id="itemImage" type="file" accept="image/*" />
+          <div class="helper">You can replace any starter image or add brand new ones directly on the live site.</div>
+
+          <div id="imagePreviewArea"></div>
+
+          <div class="row-2" style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="saveFormItem()">${editingItem ? "Save changes" : "Add button"}</button>
+            <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-heading">Parent settings</div>
+
+          <label class="label" for="newPinInput">New 4-digit PIN</label>
+          <input class="text-input" id="newPinInput" maxlength="4" inputmode="numeric" placeholder="1234" value="${escapeHtml(savedPin)}" />
+          <div class="row-2" style="margin-top:12px;">
+            <button class="btn btn-outline" onclick="changePin()">Save PIN</button>
+            <button class="btn btn-danger" onclick="lockParentMode()">Lock parent mode</button>
+          </div>
+          <div id="pinMessage"></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-heading">Quick help</div>
+          <div class="helper">Starter items still use the same file names. Uploaded images save only on this device/browser using local storage.</div>
+        </div>
+      `;
+
+      const fileInput = document.getElementById("itemImage");
+      fileInput.addEventListener("change", onPickImage);
+
+      renderImagePreview(editingItem ? editingItem.image : "");
+    }
+
+    function renderImagePreview(existingImage) {
+      const previewArea = document.getElementById("imagePreviewArea");
+      if (!previewArea) return;
+
+      const previewSrc = imageData || existingImage || "";
+      if (!previewSrc) {
+        previewArea.innerHTML = "";
+        return;
+      }
+
+      previewArea.innerHTML = `
+        <div class="preview-box">
+          <img src="${previewSrc}" alt="Preview" />
+        </div>
+      `;
+    }
+
+    function onPickImage(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function() {
+        imageData = String(reader.result || "");
+        const editingItem = editingId ? items.find(i => i.id === editingId) : null;
+        renderImagePreview(editingItem ? editingItem.image : "");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveFormItem() {
+      const label = document.getElementById("itemLabel").value.trim();
+      const phrase = document.getElementById("itemPhrase").value.trim();
+      const category = document.getElementById("itemCategory").value;
+      const emoji = document.getElementById("itemEmoji").value.trim() || "🙂";
+
+      if (!label) return;
+
+      if (editingId) {
+        items = items.map(item => {
+          if (item.id !== editingId) return item;
+          return {
+            ...item,
+            label: label,
+            phrase: phrase || label,
+            category: category,
+            emoji: emoji,
+            image: imageData || item.image || ""
+          };
+        });
+      } else {
+        items.unshift({
+          id: Date.now(),
+          category: category,
+          label: label,
+          phrase: phrase || label,
+          emoji: emoji,
+          image: imageData || "",
+          custom: true
+        });
+      }
+
+      currentCategory = category;
+      saveItems();
+      clearForm();
+      renderTabs();
+      renderGrid();
+      renderSidePanel();
+    }
+
+    function startEdit(id) {
+      editingId = id;
+      imageData = "";
+      renderSidePanel();
+    }
+
+    function deleteItem(id) {
+      items = items.filter(item => item.id !== id);
+      if (editingId === id) {
+        editingId = null;
+        imageData = "";
+      }
+      saveItems();
+      renderGrid();
+      renderSidePanel();
+    }
+
+    function clearForm() {
+      editingId = null;
+      imageData = "";
+      renderSidePanel();
+    }
+
+    function changePin() {
+      const pinInput = document.getElementById("newPinInput");
+      const pinMessage = document.getElementById("pinMessage");
+      const newPin = pinInput.value.replace(/\D/g, "").slice(0, 4);
+
+      if (!/^\d{4}$/.test(newPin)) {
+        pinMessage.innerHTML = `<div class="error-text">PIN must be exactly 4 digits.</div>`;
+        return;
+      }
+
+      savedPin = newPin;
+      localStorage.setItem(PIN_KEY, savedPin);
+      pinMessage.innerHTML = `<div class="success-text">PIN saved.</div>`;
+      pinInput.value = savedPin;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
     document.getElementById("itemModal").addEventListener("click", function(e) {
@@ -666,6 +963,7 @@
 
     renderTabs();
     renderGrid();
+    renderSidePanel();
   </script>
 </body>
 </html>
