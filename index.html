@@ -92,7 +92,8 @@
     }
 
     .tabs-wrap,
-    .card-panel {
+    .card-panel,
+    .scan-panel {
       background: white;
       border-radius: 28px;
       border: 1px solid #dbeafe;
@@ -204,7 +205,8 @@
       color: #991b1b;
     }
 
-    .card-panel {
+    .card-panel,
+    .scan-panel {
       padding: 20px;
       position: sticky;
       top: 14px;
@@ -247,6 +249,12 @@
 
     .btn-danger {
       background: #7f1d1d;
+      color: white;
+      margin-top: 10px;
+    }
+
+    .btn-green {
+      background: #166534;
       color: white;
       margin-top: 10px;
     }
@@ -307,6 +315,61 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+    }
+
+    .scan-stage {
+      margin-bottom: 18px;
+    }
+
+    .scan-card {
+      background: white;
+      border-radius: 30px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    }
+
+    .scan-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #f0f9ff;
+      border: 2px solid #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .scan-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .scan-label {
+      text-align: center;
+      font-size: 44px;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .scan-phrase {
+      text-align: center;
+      font-size: 24px;
+      color: #64748b;
+      margin-top: 8px;
+    }
+
+    .scan-meta {
+      text-align: center;
+      color: #0369a1;
+      font-weight: 700;
+      margin: 10px 0 0;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     .modal {
@@ -429,7 +492,8 @@
         grid-template-columns: 1fr;
       }
 
-      .card-panel {
+      .card-panel,
+      .scan-panel {
         position: static;
       }
 
@@ -471,6 +535,14 @@
         font-size: 120px;
       }
 
+      .scan-label {
+        font-size: 34px;
+      }
+
+      .scan-phrase {
+        font-size: 20px;
+      }
+
       .row-2,
       .edit-row {
         grid-template-columns: 1fr;
@@ -485,7 +557,7 @@
         <div>
           <div class="title-small">Toddler friendly board</div>
           <h1>My Talk Board</h1>
-          <div class="sub">Tap a category tab, then press a button to see it large and hear the word.</div>
+          <div class="sub">Tap a category tab, or use scan mode to show one item at a time every 5 seconds.</div>
         </div>
         <div class="status-box">
           <div class="status-label">Last spoken</div>
@@ -498,15 +570,40 @@
       <div>
         <div class="tabs-wrap">
           <div class="tabs" id="tabs"></div>
+          <button class="btn btn-outline" style="margin-top:12px;" id="scanToggleBtn" onclick="toggleScanMode()">Start Scan Mode</button>
         </div>
-        <div class="grid" id="grid"></div>
+
+        <div id="normalView">
+          <div class="grid" id="grid"></div>
+        </div>
+
+        <div id="scanView" class="hidden">
+          <div class="scan-panel">
+            <div class="scan-stage">
+              <div class="scan-card">
+                <div class="scan-image" id="scanImage"></div>
+                <div class="scan-label" id="scanLabel"></div>
+                <div class="scan-phrase" id="scanPhrase"></div>
+                <div class="scan-meta" id="scanMeta"></div>
+              </div>
+            </div>
+
+            <div class="row-2">
+              <button class="btn btn-outline" onclick="prevScanItem()">Previous</button>
+              <button class="btn btn-outline" id="pauseBtn" onclick="togglePauseScan()">Pause</button>
+            </div>
+            <div class="row-2" style="margin-top:10px;">
+              <button class="btn btn-outline" onclick="nextScanItem(true)">Next</button>
+              <button class="btn btn-green" onclick="selectCurrentScanItem()">Select This</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="card-panel" id="sidePanel"></div>
     </div>
   </div>
 
-  <!-- item modal -->
   <div class="modal" id="itemModal">
     <div class="modal-box">
       <button class="close-btn" onclick="closeItemModal()">×</button>
@@ -516,7 +613,6 @@
     </div>
   </div>
 
-  <!-- pin modal -->
   <div class="modal" id="pinModal">
     <div class="modal-box pin-modal-box">
       <button class="close-btn" onclick="closePinModal()">×</button>
@@ -528,28 +624,35 @@
     </div>
   </div>
 
-  <!-- help modal -->
   <div class="modal" id="helpModal">
     <div class="modal-box pin-modal-box">
       <button class="close-btn" onclick="closeHelpModal()">×</button>
       <div class="pin-title">Use this on iPad</div>
       <div class="help-text">1. Unlock parent mode with your PIN.</div>
       <div class="help-text">2. Add or edit photos directly on the live site.</div>
-      <div class="help-text">3. Tap any button and it opens bigger with voice.</div>
-      <div class="help-text">4. Lock parent mode again so only the large toddler-friendly tabs remain.</div>
+      <div class="help-text">3. Scan mode shows one item at a time every 5 seconds.</div>
+      <div class="help-text">4. When you see a reaction, press Select This.</div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "aac-child-board-items-html-v1";
+    const STORAGE_KEY = "aac-child-board-items-html-v2";
     const PIN_KEY = "aac-child-board-pin-html-v1";
     const DEFAULT_PIN = "1234";
+    const SCAN_SECONDS = 5;
 
     let savedPin = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
     let currentCategory = "Food";
     let parentMode = false;
     let editingId = null;
     let imageData = "";
+
+    let scanMode = false;
+    let scanIndex = 0;
+    let scanPaused = false;
+    let scanTimer = null;
+    let scanCountdownTimer = null;
+    let scanSecondsLeft = SCAN_SECONDS;
 
     const starterItems = [
       { id: 1, category: "Food", label: "Wotsits", phrase: "Wotsits", image: "wotsits.jpg", emoji: "🧀", custom: false },
@@ -605,6 +708,10 @@
       window.speechSynthesis.speak(utterance);
     }
 
+    function getCurrentCategoryItems() {
+      return items.filter(item => item.category === currentCategory);
+    }
+
     function renderTabs() {
       const tabs = document.getElementById("tabs");
       tabs.innerHTML = "";
@@ -615,8 +722,13 @@
         btn.textContent = cat;
         btn.onclick = function() {
           currentCategory = cat;
+          scanIndex = 0;
           renderTabs();
           renderGrid();
+          if (scanMode) {
+            renderScanCard();
+            restartScanTimers();
+          }
         };
         tabs.appendChild(btn);
       });
@@ -626,68 +738,179 @@
       const grid = document.getElementById("grid");
       grid.innerHTML = "";
 
-      items
-        .filter(item => item.category === currentCategory)
-        .forEach(item => {
-          const button = document.createElement("button");
-          button.className = "tile";
-          button.onclick = function() {
-            openItem(item);
+      getCurrentCategoryItems().forEach(item => {
+        const button = document.createElement("button");
+        button.className = "tile";
+        button.onclick = function() {
+          openItem(item);
+        };
+
+        const imageBox = document.createElement("div");
+        imageBox.className = "tile-image";
+
+        const img = document.createElement("img");
+        img.src = item.image || "";
+        img.alt = item.label;
+        img.onerror = function() {
+          imageBox.innerHTML = '<div class="emoji">' + (item.emoji || "🧩") + '</div>';
+        };
+
+        imageBox.appendChild(img);
+
+        const label = document.createElement("div");
+        label.className = "tile-label";
+        label.textContent = item.label;
+
+        const phrase = document.createElement("div");
+        phrase.className = "tile-phrase";
+        phrase.textContent = item.phrase;
+
+        button.appendChild(imageBox);
+        button.appendChild(label);
+        button.appendChild(phrase);
+
+        if (parentMode) {
+          const editRow = document.createElement("div");
+          editRow.className = "edit-row";
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "small-btn";
+          editBtn.type = "button";
+          editBtn.textContent = "Edit";
+          editBtn.onclick = function(e) {
+            e.stopPropagation();
+            startEdit(item.id);
           };
 
-          const imageBox = document.createElement("div");
-          imageBox.className = "tile-image";
-
-          const img = document.createElement("img");
-          img.src = item.image || "";
-          img.alt = item.label;
-          img.onerror = function() {
-            imageBox.innerHTML = '<div class="emoji">' + (item.emoji || "🧩") + '</div>';
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "small-btn danger";
+          deleteBtn.type = "button";
+          deleteBtn.textContent = "Delete";
+          deleteBtn.onclick = function(e) {
+            e.stopPropagation();
+            deleteItem(item.id);
           };
 
-          imageBox.appendChild(img);
+          editRow.appendChild(editBtn);
+          editRow.appendChild(deleteBtn);
+          button.appendChild(editRow);
+        }
 
-          const label = document.createElement("div");
-          label.className = "tile-label";
-          label.textContent = item.label;
+        grid.appendChild(button);
+      });
+    }
 
-          const phrase = document.createElement("div");
-          phrase.className = "tile-phrase";
-          phrase.textContent = item.phrase;
+    function renderScanCard() {
+      const categoryItems = getCurrentCategoryItems();
+      if (!categoryItems.length) {
+        document.getElementById("scanImage").innerHTML = '<div class="big-emoji">🧩</div>';
+        document.getElementById("scanLabel").textContent = "No items";
+        document.getElementById("scanPhrase").textContent = "";
+        document.getElementById("scanMeta").textContent = "";
+        return;
+      }
 
-          button.appendChild(imageBox);
-          button.appendChild(label);
-          button.appendChild(phrase);
+      if (scanIndex >= categoryItems.length) scanIndex = 0;
+      if (scanIndex < 0) scanIndex = categoryItems.length - 1;
 
-          if (parentMode) {
-            const editRow = document.createElement("div");
-            editRow.className = "edit-row";
+      const item = categoryItems[scanIndex];
+      const scanImage = document.getElementById("scanImage");
+      scanImage.innerHTML = "";
 
-            const editBtn = document.createElement("button");
-            editBtn.className = "small-btn";
-            editBtn.type = "button";
-            editBtn.textContent = "Edit";
-            editBtn.onclick = function(e) {
-              e.stopPropagation();
-              startEdit(item.id);
-            };
+      const img = document.createElement("img");
+      img.src = item.image || "";
+      img.alt = item.label;
+      img.onerror = function() {
+        scanImage.innerHTML = '<div class="big-emoji">' + (item.emoji || "🧩") + '</div>';
+      };
+      scanImage.appendChild(img);
 
-            const deleteBtn = document.createElement("button");
-            deleteBtn.className = "small-btn danger";
-            deleteBtn.type = "button";
-            deleteBtn.textContent = "Delete";
-            deleteBtn.onclick = function(e) {
-              e.stopPropagation();
-              deleteItem(item.id);
-            };
+      document.getElementById("scanLabel").textContent = item.label;
+      document.getElementById("scanPhrase").textContent = item.phrase;
+      document.getElementById("scanMeta").textContent =
+        "Item " + (scanIndex + 1) + " of " + categoryItems.length + " • Next in " + scanSecondsLeft + "s";
+    }
 
-            editRow.appendChild(editBtn);
-            editRow.appendChild(deleteBtn);
-            button.appendChild(editRow);
-          }
+    function startScanTimers() {
+      clearScanTimers();
+      scanSecondsLeft = SCAN_SECONDS;
+      renderScanCard();
 
-          grid.appendChild(button);
-        });
+      scanCountdownTimer = setInterval(() => {
+        if (scanPaused) return;
+        scanSecondsLeft -= 1;
+        if (scanSecondsLeft < 0) scanSecondsLeft = 0;
+        renderScanCard();
+      }, 1000);
+
+      scanTimer = setInterval(() => {
+        if (scanPaused) return;
+        nextScanItem(false);
+      }, SCAN_SECONDS * 1000);
+    }
+
+    function clearScanTimers() {
+      if (scanTimer) clearInterval(scanTimer);
+      if (scanCountdownTimer) clearInterval(scanCountdownTimer);
+      scanTimer = null;
+      scanCountdownTimer = null;
+    }
+
+    function restartScanTimers() {
+      scanSecondsLeft = SCAN_SECONDS;
+      if (scanMode) startScanTimers();
+    }
+
+    function toggleScanMode() {
+      scanMode = !scanMode;
+      scanPaused = false;
+      scanIndex = 0;
+
+      document.getElementById("normalView").classList.toggle("hidden", scanMode);
+      document.getElementById("scanView").classList.toggle("hidden", !scanMode);
+      document.getElementById("scanToggleBtn").textContent = scanMode ? "Stop Scan Mode" : "Start Scan Mode";
+      document.getElementById("pauseBtn").textContent = "Pause";
+
+      if (scanMode) {
+        renderScanCard();
+        startScanTimers();
+      } else {
+        clearScanTimers();
+      }
+    }
+
+    function togglePauseScan() {
+      scanPaused = !scanPaused;
+      document.getElementById("pauseBtn").textContent = scanPaused ? "Resume" : "Pause";
+      if (!scanPaused) {
+        scanSecondsLeft = SCAN_SECONDS;
+        renderScanCard();
+      }
+    }
+
+    function nextScanItem(manual) {
+      const categoryItems = getCurrentCategoryItems();
+      if (!categoryItems.length) return;
+      scanIndex = (scanIndex + 1) % categoryItems.length;
+      scanSecondsLeft = SCAN_SECONDS;
+      renderScanCard();
+      if (manual && scanMode) restartScanTimers();
+    }
+
+    function prevScanItem() {
+      const categoryItems = getCurrentCategoryItems();
+      if (!categoryItems.length) return;
+      scanIndex = (scanIndex - 1 + categoryItems.length) % categoryItems.length;
+      scanSecondsLeft = SCAN_SECONDS;
+      renderScanCard();
+      if (scanMode) restartScanTimers();
+    }
+
+    function selectCurrentScanItem() {
+      const categoryItems = getCurrentCategoryItems();
+      if (!categoryItems.length) return;
+      const item = categoryItems[scanIndex];
+      openItem(item);
     }
 
     function openItem(item) {
@@ -822,7 +1045,7 @@
 
         <div class="panel-section">
           <div class="section-heading">Quick help</div>
-          <div class="helper">Starter items still use the same file names. Uploaded images save only on this device/browser using local storage.</div>
+          <div class="helper">Scan mode is best for watching reactions. Live edits save on this device/browser only.</div>
         </div>
       `;
 
@@ -895,11 +1118,16 @@
       }
 
       currentCategory = category;
+      scanIndex = 0;
       saveItems();
       clearForm();
       renderTabs();
       renderGrid();
       renderSidePanel();
+      if (scanMode) {
+        renderScanCard();
+        restartScanTimers();
+      }
     }
 
     function startEdit(id) {
@@ -914,9 +1142,14 @@
         editingId = null;
         imageData = "";
       }
+      scanIndex = 0;
       saveItems();
       renderGrid();
       renderSidePanel();
+      if (scanMode) {
+        renderScanCard();
+        restartScanTimers();
+      }
     }
 
     function clearForm() {
