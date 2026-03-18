@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Talk Board</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
+
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #eaf7ff, #eefdf3, #fff7e8);
+      font-family: 'Nunito', Arial, sans-serif;
+      background: linear-gradient(135deg, #fef9f0 0%, #f0f9ff 50%, #f0fdf4 100%);
       color: #1f2937;
+      min-height: 100vh;
     }
 
     .wrap {
@@ -20,13 +23,14 @@
       padding: 14px;
     }
 
+    /* ── HEADER ── */
     .header {
       background: white;
-      border: 1px solid #dbeafe;
+      border: 2px solid #dbeafe;
       border-radius: 28px;
       padding: 18px;
       margin-bottom: 18px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
     }
 
     .header-top {
@@ -38,69 +42,68 @@
     }
 
     .title-small {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: #64748b;
-      margin-bottom: 8px;
+      letter-spacing: 0.2em;
+      color: #94a3b8;
+      margin-bottom: 6px;
     }
 
     h1 {
       margin: 0;
-      font-size: 42px;
+      font-size: 40px;
+      font-weight: 900;
       line-height: 1.1;
     }
 
     .sub {
-      margin-top: 10px;
-      color: #475569;
-      font-size: 20px;
-      max-width: 760px;
-      line-height: 1.4;
+      margin-top: 8px;
+      color: #64748b;
+      font-size: 17px;
+      max-width: 680px;
+      line-height: 1.5;
     }
 
     .status-box {
-      background: #e0f2fe;
-      border: 1px solid #bae6fd;
-      border-radius: 24px;
-      padding: 14px 16px;
-      min-width: 250px;
+      background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+      border: 2px solid #bae6fd;
+      border-radius: 22px;
+      padding: 14px 18px;
+      min-width: 220px;
     }
 
     .status-label {
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       color: #0369a1;
       margin-bottom: 4px;
     }
 
     .status-value {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 900;
       line-height: 1.1;
       word-break: break-word;
+      color: #0c4a6e;
     }
 
+    /* ── LAYOUT ── */
     .layout {
       display: grid;
-      grid-template-columns: 1fr 360px;
+      grid-template-columns: 1fr 380px;
       gap: 20px;
       align-items: start;
     }
 
-    .tabs-wrap,
-    .card-panel,
-    .scan-panel {
-      background: white;
-      border-radius: 28px;
-      border: 1px solid #dbeafe;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-    }
-
+    /* ── TABS ── */
     .tabs-wrap {
+      background: white;
+      border-radius: 24px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.05);
       padding: 14px;
       margin-bottom: 18px;
     }
@@ -108,53 +111,79 @@
     .tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
     .tab-btn {
-      border: 1px solid #d1d5db;
+      border: 2px solid #e2e8f0;
       background: #f8fafc;
-      color: #111827;
+      color: #475569;
       border-radius: 18px;
-      padding: 14px 18px;
-      font-size: 18px;
+      padding: 12px 20px;
+      font-size: 17px;
       font-weight: 800;
       cursor: pointer;
+      font-family: 'Nunito', Arial, sans-serif;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
     }
 
     .tab-btn.active {
-      background: #111827;
+      background: #1e293b;
       color: white;
+      border-color: #1e293b;
     }
 
+    .tab-btn .lock-icon {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    /* ── GRID ── */
     .grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
+      gap: 14px;
     }
 
+    /* ── TILE ── */
     .tile {
       background: white;
-      border: none;
-      border-radius: 30px;
-      padding: 14px;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+      border: 2px solid #f1f5f9;
+      border-radius: 26px;
+      padding: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.07);
       cursor: pointer;
       text-align: left;
       width: 100%;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      font-family: 'Nunito', Arial, sans-serif;
+    }
+
+    .tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12);
     }
 
     .tile:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
     }
 
     .tile-image {
       aspect-ratio: 1 / 1;
-      border-radius: 28px;
+      border-radius: 22px;
       overflow: hidden;
-      background: #f0f9ff;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
       border: 2px solid #dbeafe;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -166,174 +195,253 @@
       object-fit: cover;
     }
 
-    .emoji {
-      font-size: 78px;
-    }
+    .emoji { font-size: 72px; }
 
     .tile-label {
-      font-size: 30px;
+      font-size: 22px;
       font-weight: 900;
       line-height: 1.1;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .tile-phrase {
-      font-size: 18px;
-      color: #64748b;
+      font-size: 15px;
+      color: #94a3b8;
       line-height: 1.3;
     }
 
     .edit-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
     .small-btn {
-      border: 1px solid #d1d5db;
+      border: 1.5px solid #e2e8f0;
       background: white;
-      color: #111827;
-      border-radius: 16px;
-      padding: 12px;
-      font-size: 15px;
+      color: #334155;
+      border-radius: 14px;
+      padding: 10px;
+      font-size: 14px;
       font-weight: 800;
       cursor: pointer;
+      font-family: 'Nunito', Arial, sans-serif;
+      transition: background 0.1s;
     }
 
-    .small-btn.danger {
-      color: #991b1b;
+    .small-btn:hover { background: #f8fafc; }
+    .small-btn.danger { color: #dc2626; border-color: #fecaca; }
+    .small-btn.danger:hover { background: #fff5f5; }
+
+    /* ── LOCKED OVERLAY ── */
+    .locked-overlay {
+      background: white;
+      border-radius: 26px;
+      border: 2px solid #fde68a;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
     }
 
-    .card-panel,
-    .scan-panel {
-      padding: 20px;
+    .locked-overlay .lock-big { font-size: 64px; margin-bottom: 16px; }
+    .locked-overlay h3 { font-size: 26px; font-weight: 900; margin: 0 0 10px; }
+    .locked-overlay p { color: #64748b; font-size: 16px; margin: 0 0 20px; line-height: 1.5; }
+
+    /* ── SIDE PANEL ── */
+    .card-panel {
+      background: white;
+      border-radius: 28px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
       position: sticky;
       top: 14px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 20px 20px 0;
+    }
+
+    .panel-scroll {
+      padding: 0 20px 20px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
     }
 
     .card-title {
-      font-size: 30px;
+      font-size: 24px;
       font-weight: 900;
-      margin: 0 0 12px;
+      margin: 0 0 10px;
     }
 
     .locked-text {
-      color: #475569;
-      font-size: 18px;
+      color: #64748b;
+      font-size: 16px;
       line-height: 1.5;
       margin-bottom: 16px;
     }
 
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 20px;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: #111827;
-      color: white;
-    }
-
-    .btn-outline {
-      background: white;
-      color: #111827;
-      border: 1px solid #d1d5db;
-      margin-top: 10px;
-    }
-
-    .btn-danger {
-      background: #7f1d1d;
-      color: white;
-      margin-top: 10px;
-    }
-
-    .btn-green {
-      background: #166534;
-      color: white;
-      margin-top: 10px;
-    }
-
-    .panel-section {
-      margin-bottom: 22px;
-    }
-
-    .section-heading {
-      font-size: 22px;
-      font-weight: 900;
-      margin: 0 0 12px;
+    /* ── FORM ELEMENTS ── */
+    .form-group {
+      margin-bottom: 16px;
     }
 
     .label {
       display: block;
-      font-size: 14px;
-      font-weight: 700;
-      color: #334155;
-      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #475569;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
     .text-input,
-    .select-input,
-    .file-input {
+    .select-input {
       width: 100%;
-      border: 1px solid #d1d5db;
-      border-radius: 16px;
-      min-height: 52px;
-      padding: 12px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      height: 48px;
+      padding: 0 14px;
       font-size: 16px;
+      font-family: 'Nunito', Arial, sans-serif;
+      font-weight: 700;
+      background: #fafafa;
+      color: #1e293b;
+      transition: border-color 0.15s;
+    }
+
+    .text-input:focus,
+    .select-input:focus {
+      outline: none;
+      border-color: #93c5fd;
       background: white;
     }
 
-    .preview-box {
-      margin-top: 12px;
+    /* ── IMAGE UPLOAD AREA ── */
+    .upload-zone {
+      border: 2px dashed #cbd5e1;
       border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid #d1d5db;
-      background: #f8fafc;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: #fafafa;
+      position: relative;
     }
 
-    .preview-box img {
+    .upload-zone:hover {
+      border-color: #60a5fa;
+      background: #f0f9ff;
+    }
+
+    .upload-zone.has-image {
+      border-style: solid;
+      border-color: #86efac;
+      background: #f0fdf4;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
       width: 100%;
-      height: 180px;
+      height: 100%;
+    }
+
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-label { font-size: 15px; font-weight: 800; color: #475569; }
+    .upload-hint { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+
+    .preview-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
       object-fit: cover;
       display: block;
+      border-radius: 16px;
     }
 
-    .helper {
-      color: #475569;
-      font-size: 14px;
-      line-height: 1.5;
+    .preview-actions {
+      display: flex;
+      gap: 8px;
       margin-top: 8px;
     }
+
+    /* ── BUTTONS ── */
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Nunito', Arial, sans-serif;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary { background: #1e293b; color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-outline { background: white; color: #334155; border: 2px solid #e2e8f0; }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-danger { background: #7f1d1d; color: white; }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-green { background: #14532d; color: white; }
+    .btn-green:hover { opacity: 0.9; }
+    .btn-amber { background: #92400e; color: white; }
+    .btn-sm { padding: 10px 14px; font-size: 14px; width: auto; }
+
+    .btn + .btn { margin-top: 8px; }
 
     .row-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .scan-stage {
-      margin-bottom: 18px;
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 2px solid #f1f5f9;
+      margin: 20px 0;
+    }
+
+    .section-heading {
+      font-size: 18px;
+      font-weight: 900;
+      margin: 0 0 14px;
+      color: #1e293b;
+    }
+
+    /* ── SCAN ── */
+    .scan-panel {
+      background: white;
+      border-radius: 28px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      padding: 20px;
     }
 
     .scan-card {
-      background: white;
-      border-radius: 30px;
+      background: #f8fafc;
+      border-radius: 24px;
       padding: 16px;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      border: 2px solid #e2e8f0;
     }
 
     .scan-image {
       width: 100%;
       aspect-ratio: 1 / 1;
-      border-radius: 28px;
+      border-radius: 20px;
       overflow: hidden;
-      background: #f0f9ff;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
       border: 2px solid #dbeafe;
       display: flex;
       align-items: center;
@@ -341,42 +449,18 @@
       margin-bottom: 14px;
     }
 
-    .scan-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .scan-image img { width: 100%; height: 100%; object-fit: cover; }
 
-    .scan-label {
-      text-align: center;
-      font-size: 44px;
-      font-weight: 900;
-      line-height: 1.1;
-    }
+    .scan-label { text-align: center; font-size: 40px; font-weight: 900; line-height: 1.1; }
+    .scan-phrase { text-align: center; font-size: 20px; color: #64748b; margin-top: 6px; }
+    .scan-meta { text-align: center; color: #0369a1; font-weight: 800; font-size: 14px; margin: 10px 0 0; }
 
-    .scan-phrase {
-      text-align: center;
-      font-size: 24px;
-      color: #64748b;
-      margin-top: 8px;
-    }
-
-    .scan-meta {
-      text-align: center;
-      color: #0369a1;
-      font-weight: 700;
-      margin: 10px 0 0;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
+    /* ── MODALS ── */
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -384,16 +468,14 @@
       z-index: 9999;
     }
 
-    .modal.show {
-      display: flex;
-    }
+    .modal.show { display: flex; }
 
     .modal-box {
       width: 100%;
-      max-width: 760px;
+      max-width: 680px;
       background: white;
       border-radius: 32px;
-      padding: 18px;
+      padding: 20px;
       position: relative;
       box-shadow: 0 24px 60px rgba(0,0,0,0.25);
     }
@@ -402,162 +484,124 @@
       position: absolute;
       top: 14px;
       right: 14px;
-      width: 48px;
-      height: 48px;
-      border: none;
+      width: 44px;
+      height: 44px;
+      border: 2px solid #e2e8f0;
       border-radius: 999px;
-      background: #f1f5f9;
-      font-size: 28px;
+      background: #f8fafc;
+      font-size: 22px;
       cursor: pointer;
-    }
-
-    .modal-image {
-      aspect-ratio: 1 / 1;
-      width: 100%;
-      border-radius: 30px;
-      overflow: hidden;
-      background: #f0f9ff;
-      border: 1px solid #dbeafe;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .modal-image img {
+    .modal-image {
+      aspect-ratio: 1 / 1;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      border-radius: 26px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      border: 2px solid #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .big-emoji {
-      font-size: 160px;
-    }
+    .modal-image img { width: 100%; height: 100%; object-fit: cover; }
+    .big-emoji { font-size: 140px; }
 
-    .modal-label {
-      padding-top: 18px;
-      text-align: center;
-      font-size: 52px;
-      font-weight: 900;
-      line-height: 1.1;
-    }
+    .modal-label { padding-top: 16px; text-align: center; font-size: 48px; font-weight: 900; line-height: 1.1; }
+    .modal-phrase { text-align: center; font-size: 26px; color: #64748b; margin-top: 8px; line-height: 1.3; }
 
-    .modal-phrase {
-      text-align: center;
-      font-size: 28px;
-      color: #64748b;
-      margin-top: 10px;
-      line-height: 1.3;
-    }
-
-    .pin-modal-box {
-      max-width: 460px;
-    }
-
-    .pin-title {
-      font-size: 28px;
-      font-weight: 900;
-      margin-bottom: 16px;
-    }
+    .pin-modal-box { max-width: 420px; }
+    .pin-title { font-size: 24px; font-weight: 900; margin-bottom: 6px; }
+    .pin-subtitle { font-size: 15px; color: #64748b; margin-bottom: 16px; line-height: 1.4; }
 
     .pin-input {
       width: 100%;
       height: 52px;
-      border-radius: 18px;
-      border: 1px solid #d1d5db;
-      padding: 0 14px;
-      font-size: 18px;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      padding: 0 16px;
+      font-size: 20px;
+      font-family: 'Nunito', Arial, sans-serif;
+      letter-spacing: 0.3em;
+      text-align: center;
+      font-weight: 900;
     }
 
-    .error-text {
-      color: #dc2626;
-      font-size: 14px;
-      margin-top: 8px;
+    .pin-input:focus { outline: none; border-color: #93c5fd; }
+
+    .error-text { color: #dc2626; font-size: 14px; font-weight: 700; margin-top: 8px; }
+    .success-text { color: #16a34a; font-size: 14px; font-weight: 700; margin-top: 8px; }
+    .helper { color: #94a3b8; font-size: 13px; line-height: 1.5; margin-top: 6px; }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #fef9c3;
+      color: #92400e;
+      border: 1.5px solid #fde68a;
+      border-radius: 10px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 12px;
     }
 
-    .success-text {
-      color: #166534;
-      font-size: 14px;
-      margin-top: 8px;
+    /* ── PROGRESS BAR ── */
+    .scan-progress {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      margin-top: 12px;
+      overflow: hidden;
     }
 
-    .help-text {
-      color: #475569;
-      font-size: 16px;
-      line-height: 1.5;
-      margin-top: 8px;
+    .scan-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #60a5fa, #34d399);
+      border-radius: 999px;
+      transition: width 0.9s linear;
     }
 
+    .hidden { display: none !important; }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 1100px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .card-panel,
-      .scan-panel {
-        position: static;
-      }
-
-      .grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+      .layout { grid-template-columns: 1fr; }
+      .card-panel { position: static; }
+      .panel-scroll { max-height: none; }
+      .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     @media (max-width: 760px) {
-      h1 {
-        font-size: 34px;
-      }
-
-      .sub {
-        font-size: 18px;
-      }
-
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .tile-label {
-        font-size: 24px;
-      }
-
-      .tile-phrase {
-        font-size: 16px;
-      }
-
-      .modal-label {
-        font-size: 38px;
-      }
-
-      .modal-phrase {
-        font-size: 22px;
-      }
-
-      .big-emoji {
-        font-size: 120px;
-      }
-
-      .scan-label {
-        font-size: 34px;
-      }
-
-      .scan-phrase {
-        font-size: 20px;
-      }
-
-      .row-2,
-      .edit-row {
-        grid-template-columns: 1fr;
-      }
+      h1 { font-size: 30px; }
+      .sub { font-size: 15px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tile-label { font-size: 18px; }
+      .tile-phrase { font-size: 13px; }
+      .modal-label { font-size: 36px; }
+      .modal-phrase { font-size: 20px; }
+      .big-emoji { font-size: 100px; }
+      .scan-label { font-size: 30px; }
+      .row-2 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
+
+    <!-- HEADER -->
     <div class="header">
       <div class="header-top">
         <div>
           <div class="title-small">Toddler friendly board</div>
           <h1>My Talk Board</h1>
-          <div class="sub">Tap a category tab, or use scan mode to show one item at a time every 5 seconds.</div>
+          <div class="sub">Tap a picture to hear it spoken. Use scan mode to cycle through items automatically.</div>
         </div>
         <div class="status-box">
           <div class="status-label">Last spoken</div>
@@ -568,42 +612,47 @@
 
     <div class="layout">
       <div>
+
+        <!-- TABS + SCAN TOGGLE -->
         <div class="tabs-wrap">
           <div class="tabs" id="tabs"></div>
-          <button class="btn btn-outline" style="margin-top:12px;" id="scanToggleBtn" onclick="toggleScanMode()">Start Scan Mode</button>
+          <button class="btn btn-outline" id="scanToggleBtn" onclick="toggleScanMode()">▶ Start Scan Mode</button>
         </div>
 
+        <!-- NORMAL GRID VIEW -->
         <div id="normalView">
           <div class="grid" id="grid"></div>
         </div>
 
+        <!-- SCAN VIEW -->
         <div id="scanView" class="hidden">
           <div class="scan-panel">
-            <div class="scan-stage">
-              <div class="scan-card">
-                <div class="scan-image" id="scanImage"></div>
-                <div class="scan-label" id="scanLabel"></div>
-                <div class="scan-phrase" id="scanPhrase"></div>
-                <div class="scan-meta" id="scanMeta"></div>
-              </div>
+            <div class="scan-card">
+              <div class="scan-image" id="scanImage"></div>
+              <div class="scan-label" id="scanLabel"></div>
+              <div class="scan-phrase" id="scanPhrase"></div>
+              <div class="scan-meta" id="scanMeta"></div>
+              <div class="scan-progress"><div class="scan-progress-bar" id="scanProgressBar" style="width:100%"></div></div>
             </div>
-
             <div class="row-2">
-              <button class="btn btn-outline" onclick="prevScanItem()">Previous</button>
-              <button class="btn btn-outline" id="pauseBtn" onclick="togglePauseScan()">Pause</button>
+              <button class="btn btn-outline" onclick="prevScanItem()">← Previous</button>
+              <button class="btn btn-outline" id="pauseBtn" onclick="togglePauseScan()">⏸ Pause</button>
             </div>
-            <div class="row-2" style="margin-top:10px;">
-              <button class="btn btn-outline" onclick="nextScanItem(true)">Next</button>
-              <button class="btn btn-green" onclick="selectCurrentScanItem()">Select This</button>
+            <div class="row-2" style="margin-top:8px;">
+              <button class="btn btn-outline" onclick="nextScanItem(true)">Next →</button>
+              <button class="btn btn-green" onclick="selectCurrentScanItem()">✓ Select This</button>
             </div>
           </div>
         </div>
+
       </div>
 
+      <!-- SIDE PANEL -->
       <div class="card-panel" id="sidePanel"></div>
     </div>
   </div>
 
+  <!-- ITEM MODAL -->
   <div class="modal" id="itemModal">
     <div class="modal-box">
       <button class="close-btn" onclick="closeItemModal()">×</button>
@@ -613,148 +662,185 @@
     </div>
   </div>
 
+  <!-- PARENT PIN MODAL -->
   <div class="modal" id="pinModal">
     <div class="modal-box pin-modal-box">
       <button class="close-btn" onclick="closePinModal()">×</button>
-      <div class="pin-title">Enter parent PIN</div>
-      <label class="label" for="pinInput">4-digit PIN</label>
-      <input id="pinInput" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="Enter PIN" />
+      <div class="pin-title">🔒 Parent area</div>
+      <div class="pin-subtitle">Enter your 4-digit PIN to unlock editing and settings.</div>
+      <input id="pinInput" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" />
       <div class="error-text" id="pinError"></div>
-      <button class="btn btn-primary" style="margin-top:16px;" onclick="unlockParentMode()">Unlock</button>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="unlockParentMode()">Unlock</button>
     </div>
   </div>
 
+  <!-- PEOPLE TAB PIN MODAL -->
+  <div class="modal" id="peopleModal">
+    <div class="modal-box pin-modal-box">
+      <button class="close-btn" onclick="closePeopleModal()">×</button>
+      <div class="pin-title">👨‍👩‍👧 People tab</div>
+      <div class="pin-subtitle">This tab is private for home use only. Enter your PIN to view family photos.</div>
+      <input id="peoplePinInput" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" />
+      <div class="error-text" id="peoplePinError"></div>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="unlockPeopleTab()">View People</button>
+    </div>
+  </div>
+
+  <!-- HELP MODAL -->
   <div class="modal" id="helpModal">
     <div class="modal-box pin-modal-box">
       <button class="close-btn" onclick="closeHelpModal()">×</button>
-      <div class="pin-title">Use this on iPad</div>
-      <div class="help-text">1. Unlock parent mode with your PIN.</div>
-      <div class="help-text">2. Add or edit photos directly on the live site.</div>
-      <div class="help-text">3. Scan mode shows one item at a time every 5 seconds.</div>
-      <div class="help-text">4. When you see a reaction, press Select This.</div>
+      <div class="pin-title">📱 How to use</div>
+      <div class="pin-subtitle">Tips for using on an iPad or phone.</div>
+      <div class="helper" style="font-size:15px; margin-bottom:10px;">1. Tap a picture — it will speak the word aloud.</div>
+      <div class="helper" style="font-size:15px; margin-bottom:10px;">2. Unlock parent mode with your PIN to add or edit buttons.</div>
+      <div class="helper" style="font-size:15px; margin-bottom:10px;">3. The People tab is PIN-protected so it stays private at school.</div>
+      <div class="helper" style="font-size:15px; margin-bottom:10px;">4. Scan mode shows one item at a time — press Select This when you see a reaction.</div>
+      <div class="helper" style="font-size:15px;">5. Everything saves on this device/browser automatically.</div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "aac-child-board-items-html-v2";
-    const PIN_KEY = "aac-child-board-pin-html-v1";
-    const DEFAULT_PIN = "1234";
-    const SCAN_SECONDS = 5;
+    const STORAGE_KEY   = "aac-child-board-v3";
+    const PIN_KEY       = "aac-parent-pin-v1";
+    const PEOPLE_UNLOCKED_KEY = "aac-people-unlocked-session";
+    const DEFAULT_PIN   = "1234";
+    const SCAN_SECONDS  = 5;
 
-    let savedPin = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
+    let savedPin      = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
     let currentCategory = "Food";
-    let parentMode = false;
-    let editingId = null;
-    let imageData = "";
+    let parentMode    = false;
+    let editingId     = null;
+    let imageData     = "";
+    let peopleUnlocked = false; // session only, not persisted
 
-    let scanMode = false;
-    let scanIndex = 0;
-    let scanPaused = false;
-    let scanTimer = null;
-    let scanCountdownTimer = null;
+    let scanMode      = false;
+    let scanIndex     = 0;
+    let scanPaused    = false;
+    let scanTimer     = null;
+    let scanCountdown = null;
     let scanSecondsLeft = SCAN_SECONDS;
 
+    const PRIVATE_CATS = ["People"]; // categories that need separate PIN
+
     const starterItems = [
-      { id: 1, category: "Food", label: "Wotsits", phrase: "Wotsits", image: "wotsits.jpg", emoji: "🧀", custom: false },
-      { id: 2, category: "Food", label: "Skips", phrase: "Skips", image: "skips.jpg", emoji: "🍤", custom: false },
-      { id: 3, category: "Food", label: "Nutella Biscuits", phrase: "Nutella Biscuits", image: "nutella.jpg", emoji: "🍪", custom: false },
-      { id: 4, category: "Food", label: "Jaffa Cakes", phrase: "Jaffa Cakes", image: "jaffa.jpg", emoji: "🍰", custom: false },
-      { id: 5, category: "Food", label: "Maryland Cookies", phrase: "Maryland Cookies", image: "maryland.jpg", emoji: "🍪", custom: false },
-      { id: 6, category: "Food", label: "Coffee Shop", phrase: "Coffee Shop", image: "coffee.jpg", emoji: "☕", custom: false },
-
-      { id: 7, category: "Play", label: "Swing", phrase: "Swing", image: "swing.jpg", emoji: "🛝", custom: false },
-      { id: 8, category: "Play", label: "Trampoline", phrase: "Trampoline", image: "trampoline.jpg", emoji: "🤸", custom: false },
-      { id: 9, category: "Play", label: "Park Swing", phrase: "Park Swing", image: "parkswing.jpg", emoji: "🎠", custom: false },
-
-      { id: 10, category: "Mood", label: "Happy", phrase: "Happy", image: "happy.jpg", emoji: "😊", custom: false },
-      { id: 11, category: "Mood", label: "Sad", phrase: "Sad", image: "sad.jpg", emoji: "😢", custom: false },
-
-      { id: 12, category: "People", label: "Mum", phrase: "Mum", image: "mum.jpg", emoji: "👩", custom: false },
-      { id: 13, category: "People", label: "Dad", phrase: "Dad", image: "dad.jpg", emoji: "👨", custom: false },
-      { id: 14, category: "People", label: "Sami", phrase: "Sami", image: "sami.jpg", emoji: "🧒", custom: false },
-      { id: 15, category: "People", label: "Sufyaan", phrase: "Sufyaan", image: "sufyaan.jpg", emoji: "🧒", custom: false },
-      { id: 16, category: "People", label: "Nafeesah", phrase: "Nafeesah", image: "nafeesah.jpg", emoji: "👧", custom: false },
-      { id: 17, category: "People", label: "Laibah", phrase: "Laibah", image: "laibah.jpg", emoji: "👧", custom: false },
-      { id: 18, category: "People", label: "Kab", phrase: "Kab", image: "kab.jpg", emoji: "🧒", custom: false },
-      { id: 19, category: "People", label: "Meera", phrase: "Meera", image: "meera.jpg", emoji: "👧", custom: false }
+      { id: 1,  category: "Food",   label: "Wotsits",         phrase: "Wotsits",         image: "wotsits.jpg",    emoji: "🧀" },
+      { id: 2,  category: "Food",   label: "Skips",           phrase: "Skips",           image: "skips.jpg",      emoji: "🍤" },
+      { id: 3,  category: "Food",   label: "Nutella Biscuits",phrase: "Nutella Biscuits", image: "nutella.jpg",    emoji: "🍪" },
+      { id: 4,  category: "Food",   label: "Jaffa Cakes",     phrase: "Jaffa Cakes",     image: "jaffa.jpg",      emoji: "🍰" },
+      { id: 5,  category: "Food",   label: "Maryland Cookies",phrase: "Maryland Cookies", image: "maryland.jpg",   emoji: "🍪" },
+      { id: 6,  category: "Food",   label: "Coffee Shop",     phrase: "Coffee Shop",     image: "coffee.jpg",     emoji: "☕" },
+      { id: 7,  category: "Play",   label: "Swing",           phrase: "Swing",           image: "swing.jpg",      emoji: "🛝" },
+      { id: 8,  category: "Play",   label: "Trampoline",      phrase: "Trampoline",      image: "trampoline.jpg", emoji: "🤸" },
+      { id: 9,  category: "Play",   label: "Park Swing",      phrase: "Park Swing",      image: "parkswing.jpg",  emoji: "🎠" },
+      { id: 10, category: "Mood",   label: "Happy",           phrase: "Happy",           image: "happy.jpg",      emoji: "😊" },
+      { id: 11, category: "Mood",   label: "Sad",             phrase: "Sad",             image: "sad.jpg",        emoji: "😢" },
+      { id: 12, category: "People", label: "Mum",             phrase: "Mum",             image: "mum.jpg",        emoji: "👩" },
+      { id: 13, category: "People", label: "Dad",             phrase: "Dad",             image: "dad.jpg",        emoji: "👨" },
+      { id: 14, category: "People", label: "Sami",            phrase: "Sami",            image: "sami.jpg",       emoji: "🧒" },
+      { id: 15, category: "People", label: "Sufyaan",         phrase: "Sufyaan",         image: "sufyaan.jpg",    emoji: "🧒" },
+      { id: 16, category: "People", label: "Nafeesah",        phrase: "Nafeesah",        image: "nafeesah.jpg",   emoji: "👧" },
+      { id: 17, category: "People", label: "Laibah",          phrase: "Laibah",          image: "laibah.jpg",     emoji: "👧" },
+      { id: 18, category: "People", label: "Kab",             phrase: "Kab",             image: "kab.jpg",        emoji: "🧒" },
+      { id: 19, category: "People", label: "Meera",           phrase: "Meera",           image: "meera.jpg",      emoji: "👧" },
     ];
 
     let items = loadItems();
     const categories = ["Food", "Play", "Mood", "People"];
 
+    /* ─── STORAGE ─── */
     function loadItems() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) return [...starterItems];
       try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
-        return [...starterItems];
-      } catch {
-        return [...starterItems];
-      }
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length) return parsed;
+        }
+      } catch {}
+      return [...starterItems];
     }
 
     function saveItems() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }
 
+    /* ─── SPEECH ─── */
     function speakText(text) {
       if (!("speechSynthesis" in window)) return;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.85;
-      utterance.pitch = 1;
-      utterance.volume = 1;
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.85; u.pitch = 1; u.volume = 1;
       window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.speak(u);
     }
 
+    /* ─── HELPERS ─── */
     function getCurrentCategoryItems() {
-      return items.filter(item => item.category === currentCategory);
+      return items.filter(i => i.category === currentCategory);
     }
 
+    function isPrivateCategory(cat) {
+      return PRIVATE_CATS.includes(cat);
+    }
+
+    function escapeHtml(v) {
+      return String(v || "")
+        .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    /* ─── TABS ─── */
     function renderTabs() {
       const tabs = document.getElementById("tabs");
       tabs.innerHTML = "";
-
       categories.forEach(cat => {
         const btn = document.createElement("button");
+        const isPrivate = isPrivateCategory(cat);
+        const isLocked  = isPrivate && !peopleUnlocked;
         btn.className = "tab-btn" + (cat === currentCategory ? " active" : "");
-        btn.textContent = cat;
-        btn.onclick = function() {
+        btn.innerHTML = escapeHtml(cat) + (isLocked ? ' <span class="lock-icon">🔒</span>' : "");
+        btn.onclick = () => {
+          if (isPrivate && !peopleUnlocked) {
+            openPeopleModal();
+            return;
+          }
           currentCategory = cat;
           scanIndex = 0;
           renderTabs();
           renderGrid();
-          if (scanMode) {
-            renderScanCard();
-            restartScanTimers();
-          }
+          if (scanMode) { renderScanCard(); restartScanTimers(); }
         };
         tabs.appendChild(btn);
       });
     }
 
+    /* ─── GRID ─── */
     function renderGrid() {
       const grid = document.getElementById("grid");
       grid.innerHTML = "";
 
+      // Show locked overlay for private category
+      if (isPrivateCategory(currentCategory) && !peopleUnlocked) {
+        grid.innerHTML = `
+          <div class="locked-overlay" style="grid-column:1/-1;">
+            <div class="lock-big">🔒</div>
+            <h3>People tab is private</h3>
+            <p>This tab is for home use only and stays hidden at school.<br>Enter your PIN to see family photos.</p>
+            <button class="btn btn-primary" style="max-width:240px;margin:0 auto;" onclick="openPeopleModal()">Unlock People tab</button>
+          </div>`;
+        return;
+      }
+
       getCurrentCategoryItems().forEach(item => {
         const button = document.createElement("button");
         button.className = "tile";
-        button.onclick = function() {
-          openItem(item);
-        };
+        button.onclick = () => openItem(item);
 
         const imageBox = document.createElement("div");
         imageBox.className = "tile-image";
-
         const img = document.createElement("img");
         img.src = item.image || "";
         img.alt = item.label;
-        img.onerror = function() {
-          imageBox.innerHTML = '<div class="emoji">' + (item.emoji || "🧩") + '</div>';
-        };
-
+        img.onerror = () => { imageBox.innerHTML = `<div class="emoji">${item.emoji || "🧩"}</div>`; };
         imageBox.appendChild(img);
 
         const label = document.createElement("div");
@@ -765,9 +851,7 @@
         phrase.className = "tile-phrase";
         phrase.textContent = item.phrase;
 
-        button.appendChild(imageBox);
-        button.appendChild(label);
-        button.appendChild(phrase);
+        button.append(imageBox, label, phrase);
 
         if (parentMode) {
           const editRow = document.createElement("div");
@@ -776,23 +860,16 @@
           const editBtn = document.createElement("button");
           editBtn.className = "small-btn";
           editBtn.type = "button";
-          editBtn.textContent = "Edit";
-          editBtn.onclick = function(e) {
-            e.stopPropagation();
-            startEdit(item.id);
-          };
+          editBtn.textContent = "✏️ Edit";
+          editBtn.onclick = e => { e.stopPropagation(); startEdit(item.id); };
 
-          const deleteBtn = document.createElement("button");
-          deleteBtn.className = "small-btn danger";
-          deleteBtn.type = "button";
-          deleteBtn.textContent = "Delete";
-          deleteBtn.onclick = function(e) {
-            e.stopPropagation();
-            deleteItem(item.id);
-          };
+          const delBtn = document.createElement("button");
+          delBtn.className = "small-btn danger";
+          delBtn.type = "button";
+          delBtn.textContent = "🗑 Delete";
+          delBtn.onclick = e => { e.stopPropagation(); deleteItem(item.id); };
 
-          editRow.appendChild(editBtn);
-          editRow.appendChild(deleteBtn);
+          editRow.append(editBtn, delBtn);
           button.appendChild(editRow);
         }
 
@@ -800,9 +877,10 @@
       });
     }
 
+    /* ─── SCAN ─── */
     function renderScanCard() {
-      const categoryItems = getCurrentCategoryItems();
-      if (!categoryItems.length) {
+      const catItems = getCurrentCategoryItems();
+      if (!catItems.length) {
         document.getElementById("scanImage").innerHTML = '<div class="big-emoji">🧩</div>';
         document.getElementById("scanLabel").textContent = "No items";
         document.getElementById("scanPhrase").textContent = "";
@@ -810,25 +888,25 @@
         return;
       }
 
-      if (scanIndex >= categoryItems.length) scanIndex = 0;
-      if (scanIndex < 0) scanIndex = categoryItems.length - 1;
+      if (scanIndex >= catItems.length) scanIndex = 0;
+      if (scanIndex < 0) scanIndex = catItems.length - 1;
 
-      const item = categoryItems[scanIndex];
-      const scanImage = document.getElementById("scanImage");
-      scanImage.innerHTML = "";
-
+      const item = catItems[scanIndex];
+      const si = document.getElementById("scanImage");
+      si.innerHTML = "";
       const img = document.createElement("img");
       img.src = item.image || "";
       img.alt = item.label;
-      img.onerror = function() {
-        scanImage.innerHTML = '<div class="big-emoji">' + (item.emoji || "🧩") + '</div>';
-      };
-      scanImage.appendChild(img);
+      img.onerror = () => { si.innerHTML = `<div class="big-emoji">${item.emoji || "🧩"}</div>`; };
+      si.appendChild(img);
 
       document.getElementById("scanLabel").textContent = item.label;
       document.getElementById("scanPhrase").textContent = item.phrase;
       document.getElementById("scanMeta").textContent =
-        "Item " + (scanIndex + 1) + " of " + categoryItems.length + " • Next in " + scanSecondsLeft + "s";
+        `Item ${scanIndex + 1} of ${catItems.length} • Next in ${scanSecondsLeft}s`;
+
+      const pct = (scanSecondsLeft / SCAN_SECONDS) * 100;
+      document.getElementById("scanProgressBar").style.width = pct + "%";
     }
 
     function startScanTimers() {
@@ -836,10 +914,9 @@
       scanSecondsLeft = SCAN_SECONDS;
       renderScanCard();
 
-      scanCountdownTimer = setInterval(() => {
+      scanCountdown = setInterval(() => {
         if (scanPaused) return;
-        scanSecondsLeft -= 1;
-        if (scanSecondsLeft < 0) scanSecondsLeft = 0;
+        scanSecondsLeft = Math.max(0, scanSecondsLeft - 1);
         renderScanCard();
       }, 1000);
 
@@ -850,10 +927,9 @@
     }
 
     function clearScanTimers() {
-      if (scanTimer) clearInterval(scanTimer);
-      if (scanCountdownTimer) clearInterval(scanCountdownTimer);
-      scanTimer = null;
-      scanCountdownTimer = null;
+      clearInterval(scanTimer);
+      clearInterval(scanCountdown);
+      scanTimer = scanCountdown = null;
     }
 
     function restartScanTimers() {
@@ -865,92 +941,75 @@
       scanMode = !scanMode;
       scanPaused = false;
       scanIndex = 0;
-
       document.getElementById("normalView").classList.toggle("hidden", scanMode);
       document.getElementById("scanView").classList.toggle("hidden", !scanMode);
-      document.getElementById("scanToggleBtn").textContent = scanMode ? "Stop Scan Mode" : "Start Scan Mode";
-      document.getElementById("pauseBtn").textContent = "Pause";
-
-      if (scanMode) {
-        renderScanCard();
-        startScanTimers();
-      } else {
-        clearScanTimers();
-      }
+      document.getElementById("scanToggleBtn").textContent = scanMode ? "⏹ Stop Scan Mode" : "▶ Start Scan Mode";
+      document.getElementById("pauseBtn").textContent = "⏸ Pause";
+      if (scanMode) { renderScanCard(); startScanTimers(); } else clearScanTimers();
     }
 
     function togglePauseScan() {
       scanPaused = !scanPaused;
-      document.getElementById("pauseBtn").textContent = scanPaused ? "Resume" : "Pause";
-      if (!scanPaused) {
-        scanSecondsLeft = SCAN_SECONDS;
-        renderScanCard();
-      }
+      document.getElementById("pauseBtn").textContent = scanPaused ? "▶ Resume" : "⏸ Pause";
+      if (!scanPaused) { scanSecondsLeft = SCAN_SECONDS; renderScanCard(); }
     }
 
     function nextScanItem(manual) {
-      const categoryItems = getCurrentCategoryItems();
-      if (!categoryItems.length) return;
-      scanIndex = (scanIndex + 1) % categoryItems.length;
+      const ci = getCurrentCategoryItems();
+      if (!ci.length) return;
+      scanIndex = (scanIndex + 1) % ci.length;
       scanSecondsLeft = SCAN_SECONDS;
       renderScanCard();
       if (manual && scanMode) restartScanTimers();
     }
 
     function prevScanItem() {
-      const categoryItems = getCurrentCategoryItems();
-      if (!categoryItems.length) return;
-      scanIndex = (scanIndex - 1 + categoryItems.length) % categoryItems.length;
+      const ci = getCurrentCategoryItems();
+      if (!ci.length) return;
+      scanIndex = (scanIndex - 1 + ci.length) % ci.length;
       scanSecondsLeft = SCAN_SECONDS;
       renderScanCard();
       if (scanMode) restartScanTimers();
     }
 
     function selectCurrentScanItem() {
-      const categoryItems = getCurrentCategoryItems();
-      if (!categoryItems.length) return;
-      const item = categoryItems[scanIndex];
-      openItem(item);
+      const ci = getCurrentCategoryItems();
+      if (ci.length) openItem(ci[scanIndex]);
     }
 
+    /* ─── ITEM MODAL ─── */
     function openItem(item) {
       document.getElementById("lastSpoken").textContent = item.phrase || item.label;
       document.getElementById("modalLabel").textContent = item.label;
       document.getElementById("modalPhrase").textContent = item.phrase;
 
-      const modalImage = document.getElementById("modalImage");
-      modalImage.innerHTML = "";
-
+      const mi = document.getElementById("modalImage");
+      mi.innerHTML = "";
       const img = document.createElement("img");
       img.src = item.image || "";
       img.alt = item.label;
-      img.onerror = function() {
-        modalImage.innerHTML = '<div class="big-emoji">' + (item.emoji || "🧩") + '</div>';
-      };
-
-      modalImage.appendChild(img);
+      img.onerror = () => { mi.innerHTML = `<div class="big-emoji">${item.emoji || "🧩"}</div>`; };
+      mi.appendChild(img);
 
       document.getElementById("itemModal").classList.add("show");
       speakText(item.phrase || item.label);
     }
 
-    function closeItemModal() {
-      document.getElementById("itemModal").classList.remove("show");
-    }
+    function closeItemModal() { document.getElementById("itemModal").classList.remove("show"); }
 
+    /* ─── PARENT PIN ─── */
     function openPinModal() {
       document.getElementById("pinInput").value = "";
       document.getElementById("pinError").textContent = "";
       document.getElementById("pinModal").classList.add("show");
+      setTimeout(() => document.getElementById("pinInput").focus(), 100);
     }
 
-    function closePinModal() {
-      document.getElementById("pinModal").classList.remove("show");
-    }
+    function closePinModal() { document.getElementById("pinModal").classList.remove("show"); }
 
     function unlockParentMode() {
-      const pinInput = document.getElementById("pinInput").value;
-      if (pinInput === savedPin) {
+      const val = document.getElementById("pinInput").value;
+      if (val === savedPin) {
         parentMode = true;
         closePinModal();
         renderSidePanel();
@@ -968,232 +1027,257 @@
       renderGrid();
     }
 
-    function openHelpModal() {
-      document.getElementById("helpModal").classList.add("show");
+    /* ─── PEOPLE TAB PIN ─── */
+    function openPeopleModal() {
+      document.getElementById("peoplePinInput").value = "";
+      document.getElementById("peoplePinError").textContent = "";
+      document.getElementById("peopleModal").classList.add("show");
+      setTimeout(() => document.getElementById("peoplePinInput").focus(), 100);
     }
 
-    function closeHelpModal() {
-      document.getElementById("helpModal").classList.remove("show");
+    function closePeopleModal() { document.getElementById("peopleModal").classList.remove("show"); }
+
+    function unlockPeopleTab() {
+      const val = document.getElementById("peoplePinInput").value;
+      if (val === savedPin) {
+        peopleUnlocked = true;
+        currentCategory = "People";
+        closePeopleModal();
+        renderTabs();
+        renderGrid();
+      } else {
+        document.getElementById("peoplePinError").textContent = "Incorrect PIN. Please try again.";
+      }
     }
 
+    /* ─── HELP MODAL ─── */
+    function openHelpModal() { document.getElementById("helpModal").classList.add("show"); }
+    function closeHelpModal() { document.getElementById("helpModal").classList.remove("show"); }
+
+    /* ─── SIDE PANEL ─── */
     function renderSidePanel() {
       const side = document.getElementById("sidePanel");
 
       if (!parentMode) {
         side.innerHTML = `
-          <h2 class="card-title">Parent area locked</h2>
-          <div class="locked-text">
-            Your child only sees the category tabs and communication buttons. Editing, deleting, uploading photos, and changing settings stay hidden until you unlock parent mode.
+          <div class="panel-header">
+            <h2 class="card-title">Parent area</h2>
+            <div class="locked-text">Edit buttons, upload photos, and change settings — all hidden until you unlock.</div>
           </div>
-          <button class="btn btn-primary" onclick="openPinModal()">Unlock parent mode</button>
-          <button class="btn btn-outline" onclick="openHelpModal()">How to use on iPad</button>
-        `;
+          <div class="panel-scroll">
+            <button class="btn btn-primary" onclick="openPinModal()">🔒 Unlock parent mode</button>
+            <button class="btn btn-outline" onclick="openHelpModal()">📱 How to use</button>
+          </div>`;
         return;
       }
 
       const editingItem = editingId ? items.find(i => i.id === editingId) : null;
+      const previewSrc  = imageData || (editingItem ? editingItem.image : "") || "";
 
       side.innerHTML = `
-        <div class="panel-section">
-          <h2 class="card-title">${editingItem ? "Edit button" : "Add a new button"}</h2>
+        <div class="panel-header">
+          <h2 class="card-title">${editingItem ? "✏️ Edit button" : "➕ Add a button"}</h2>
+          ${editingItem ? `<div class="badge">📝 Editing: ${escapeHtml(editingItem.label)}</div>` : ""}
+        </div>
+        <div class="panel-scroll">
 
-          <label class="label" for="itemLabel">Button name</label>
-          <input class="text-input" id="itemLabel" placeholder="Example: Sami" value="${escapeHtml(editingItem ? editingItem.label : "")}" />
+          <!-- IMAGE UPLOAD — top and prominent -->
+          <div class="form-group">
+            <label class="label">Photo</label>
+            <div class="upload-zone ${previewSrc ? "has-image" : ""}" id="uploadZone">
+              <input type="file" accept="image/*" id="itemImage" />
+              ${previewSrc
+                ? `<img src="${escapeHtml(previewSrc)}" class="preview-img" alt="Preview" />`
+                : `<div class="upload-icon">📷</div>
+                   <div class="upload-label">Tap to choose a photo</div>
+                   <div class="upload-hint">JPG, PNG, GIF — any size</div>`}
+            </div>
+            ${previewSrc ? `
+              <div class="preview-actions">
+                <button class="btn btn-outline btn-sm" onclick="clearImage()">🗑 Remove photo</button>
+              </div>` : ""}
+          </div>
 
-          <div style="height:12px;"></div>
+          <div class="form-group">
+            <label class="label" for="itemEmoji">Emoji (shown if no photo)</label>
+            <input class="text-input" id="itemEmoji" placeholder="🙂" value="${escapeHtml(editingItem ? (editingItem.emoji || "") : "🙂")}" />
+          </div>
 
-          <label class="label" for="itemPhrase">What it should say</label>
-          <input class="text-input" id="itemPhrase" placeholder="Example: Sami" value="${escapeHtml(editingItem ? editingItem.phrase : "")}" />
+          <div class="form-group">
+            <label class="label" for="itemLabel">Button name</label>
+            <input class="text-input" id="itemLabel" placeholder="e.g. Sami" value="${escapeHtml(editingItem ? editingItem.label : "")}" />
+          </div>
 
-          <div style="height:12px;"></div>
+          <div class="form-group">
+            <label class="label" for="itemPhrase">What it should say</label>
+            <input class="text-input" id="itemPhrase" placeholder="e.g. I want Sami" value="${escapeHtml(editingItem ? editingItem.phrase : "")}" />
+          </div>
 
-          <label class="label" for="itemCategory">Category</label>
-          <select class="select-input" id="itemCategory">
-            ${categories.map(cat => `<option value="${cat}" ${editingItem && editingItem.category === cat ? "selected" : (!editingItem && currentCategory === cat ? "selected" : "")}>${cat}</option>`).join("")}
-          </select>
+          <div class="form-group">
+            <label class="label" for="itemCategory">Category</label>
+            <select class="select-input" id="itemCategory">
+              ${categories.map(cat =>
+                `<option value="${cat}" ${(editingItem ? editingItem.category : currentCategory) === cat ? "selected" : ""}>${cat}</option>`
+              ).join("")}
+            </select>
+          </div>
 
-          <div style="height:12px;"></div>
-
-          <label class="label" for="itemEmoji">Emoji fallback</label>
-          <input class="text-input" id="itemEmoji" placeholder="🙂" value="${escapeHtml(editingItem ? (editingItem.emoji || "") : "🙂")}" />
-
-          <div style="height:12px;"></div>
-
-          <label class="label" for="itemImage">Upload your own photo</label>
-          <input class="file-input" id="itemImage" type="file" accept="image/*" />
-          <div class="helper">You can replace any starter image or add brand new ones directly on the live site.</div>
-
-          <div id="imagePreviewArea"></div>
-
-          <div class="row-2" style="margin-top:16px;">
+          <div class="row-2">
             <button class="btn btn-primary" onclick="saveFormItem()">${editingItem ? "Save changes" : "Add button"}</button>
-            <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+            <button class="btn btn-outline" onclick="clearForm()">Cancel</button>
           </div>
-        </div>
 
-        <div class="panel-section">
-          <div class="section-heading">Parent settings</div>
+          <hr class="divider" />
 
-          <label class="label" for="newPinInput">New 4-digit PIN</label>
-          <input class="text-input" id="newPinInput" maxlength="4" inputmode="numeric" placeholder="1234" value="${escapeHtml(savedPin)}" />
-          <div class="row-2" style="margin-top:12px;">
+          <div class="section-heading">⚙️ Settings</div>
+
+          <div class="form-group">
+            <label class="label" for="newPinInput">Change PIN</label>
+            <input class="text-input" id="newPinInput" maxlength="4" inputmode="numeric" placeholder="4 digits" value="${escapeHtml(savedPin)}" />
+            <div id="pinMessage"></div>
+          </div>
+
+          <div class="row-2">
             <button class="btn btn-outline" onclick="changePin()">Save PIN</button>
-            <button class="btn btn-danger" onclick="lockParentMode()">Lock parent mode</button>
+            <button class="btn btn-danger" onclick="lockParentMode()">🔒 Lock</button>
           </div>
-          <div id="pinMessage"></div>
-        </div>
 
-        <div class="panel-section">
-          <div class="section-heading">Quick help</div>
-          <div class="helper">Scan mode is best for watching reactions. Live edits save on this device/browser only.</div>
-        </div>
-      `;
+          <hr class="divider" />
 
-      const fileInput = document.getElementById("itemImage");
-      fileInput.addEventListener("change", onPickImage);
+          <div class="helper">💡 People tab is always PIN-locked at startup, so it stays private at school. Everything saves to this browser automatically.</div>
+        </div>`;
 
-      renderImagePreview(editingItem ? editingItem.image : "");
+      // attach file handler after render
+      document.getElementById("itemImage").addEventListener("change", onPickImage);
     }
 
-    function renderImagePreview(existingImage) {
-      const previewArea = document.getElementById("imagePreviewArea");
-      if (!previewArea) return;
-
-      const previewSrc = imageData || existingImage || "";
-      if (!previewSrc) {
-        previewArea.innerHTML = "";
-        return;
-      }
-
-      previewArea.innerHTML = `
-        <div class="preview-box">
-          <img src="${previewSrc}" alt="Preview" />
-        </div>
-      `;
-    }
-
+    /* ─── IMAGE PICK ─── */
     function onPickImage(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
-      reader.onload = function() {
+      reader.onload = () => {
         imageData = String(reader.result || "");
-        const editingItem = editingId ? items.find(i => i.id === editingId) : null;
-        renderImagePreview(editingItem ? editingItem.image : "");
+        renderSidePanel(); // re-render to show preview
       };
       reader.readAsDataURL(file);
     }
 
-    function saveFormItem() {
-      const label = document.getElementById("itemLabel").value.trim();
-      const phrase = document.getElementById("itemPhrase").value.trim();
-      const category = document.getElementById("itemCategory").value;
-      const emoji = document.getElementById("itemEmoji").value.trim() || "🙂";
+    function clearImage() {
+      imageData = "";
+      if (editingId) {
+        // Also clear from the item so preview knows it's gone
+        items = items.map(i => i.id === editingId ? { ...i, image: "" } : i);
+      }
+      renderSidePanel();
+    }
 
-      if (!label) return;
+    /* ─── SAVE / EDIT / DELETE ─── */
+    function saveFormItem() {
+      const label    = (document.getElementById("itemLabel").value || "").trim();
+      const phrase   = (document.getElementById("itemPhrase").value || "").trim();
+      const category = document.getElementById("itemCategory").value;
+      const emoji    = (document.getElementById("itemEmoji").value || "").trim() || "🙂";
+
+      if (!label) {
+        document.getElementById("itemLabel").focus();
+        return;
+      }
 
       if (editingId) {
-        items = items.map(item => {
-          if (item.id !== editingId) return item;
+        const existingItem = items.find(i => i.id === editingId);
+        items = items.map(i => {
+          if (i.id !== editingId) return i;
           return {
-            ...item,
-            label: label,
+            ...i,
+            label,
             phrase: phrase || label,
-            category: category,
-            emoji: emoji,
-            image: imageData || item.image || ""
+            category,
+            emoji,
+            image: imageData || (existingItem ? existingItem.image : "") || ""
           };
         });
       } else {
         items.unshift({
           id: Date.now(),
-          category: category,
-          label: label,
+          category,
+          label,
           phrase: phrase || label,
-          emoji: emoji,
-          image: imageData || "",
-          custom: true
+          emoji,
+          image: imageData || ""
         });
       }
 
       currentCategory = category;
+
+      // Unlock people tab if adding to it
+      if (category === "People" && parentMode) peopleUnlocked = true;
+
       scanIndex = 0;
       saveItems();
       clearForm();
-      renderTabs();
-      renderGrid();
-      renderSidePanel();
-      if (scanMode) {
-        renderScanCard();
-        restartScanTimers();
-      }
     }
 
     function startEdit(id) {
       editingId = id;
       imageData = "";
       renderSidePanel();
+      // Scroll panel to top
+      const ps = document.querySelector(".panel-scroll");
+      if (ps) ps.scrollTop = 0;
     }
 
     function deleteItem(id) {
-      items = items.filter(item => item.id !== id);
-      if (editingId === id) {
-        editingId = null;
-        imageData = "";
-      }
+      if (!confirm("Delete this button?")) return;
+      items = items.filter(i => i.id !== id);
+      if (editingId === id) { editingId = null; imageData = ""; }
       scanIndex = 0;
       saveItems();
       renderGrid();
       renderSidePanel();
-      if (scanMode) {
-        renderScanCard();
-        restartScanTimers();
-      }
+      if (scanMode) { renderScanCard(); restartScanTimers(); }
     }
 
     function clearForm() {
       editingId = null;
       imageData = "";
+      renderTabs();
+      renderGrid();
       renderSidePanel();
+      if (scanMode) { renderScanCard(); restartScanTimers(); }
     }
 
+    /* ─── CHANGE PIN ─── */
     function changePin() {
-      const pinInput = document.getElementById("newPinInput");
-      const pinMessage = document.getElementById("pinMessage");
-      const newPin = pinInput.value.replace(/\D/g, "").slice(0, 4);
-
-      if (!/^\d{4}$/.test(newPin)) {
-        pinMessage.innerHTML = `<div class="error-text">PIN must be exactly 4 digits.</div>`;
+      const val = (document.getElementById("newPinInput").value || "").replace(/\D/g, "").slice(0, 4);
+      const msg = document.getElementById("pinMessage");
+      if (!/^\d{4}$/.test(val)) {
+        msg.innerHTML = `<div class="error-text">PIN must be exactly 4 digits.</div>`;
         return;
       }
-
-      savedPin = newPin;
+      savedPin = val;
       localStorage.setItem(PIN_KEY, savedPin);
-      pinMessage.innerHTML = `<div class="success-text">PIN saved.</div>`;
-      pinInput.value = savedPin;
+      msg.innerHTML = `<div class="success-text">✓ PIN saved!</div>`;
     }
 
-    function escapeHtml(value) {
-      return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    document.getElementById("itemModal").addEventListener("click", function(e) {
-      if (e.target.id === "itemModal") closeItemModal();
+    /* ─── MODAL CLICK-OUTSIDE ─── */
+    ["itemModal","pinModal","peopleModal","helpModal"].forEach(id => {
+      document.getElementById(id).addEventListener("click", e => {
+        if (e.target.id === id) {
+          closeItemModal(); closePinModal(); closePeopleModal(); closeHelpModal();
+        }
+      });
     });
 
-    document.getElementById("pinModal").addEventListener("click", function(e) {
-      if (e.target.id === "pinModal") closePinModal();
+    /* ─── ENTER KEY FOR PIN INPUTS ─── */
+    document.getElementById("pinInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") unlockParentMode();
+    });
+    document.getElementById("peoplePinInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") unlockPeopleTab();
     });
 
-    document.getElementById("helpModal").addEventListener("click", function(e) {
-      if (e.target.id === "helpModal") closeHelpModal();
-    });
-
+    /* ─── INIT ─── */
     renderTabs();
     renderGrid();
     renderSidePanel();
